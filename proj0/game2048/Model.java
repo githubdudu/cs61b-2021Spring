@@ -111,14 +111,64 @@ public class Model extends Observable {
         changed = false;
 
         // TODO: Modify this.board (and perhaps this.score) to account
+        /** The move for the tiles in a single row, or a single column
+         *  is very like the algorithm of selection sort.
+         */
+        board.setViewingPerspective(side);
+        int size = board.size();
+        for (int i = 0; i < size; i += 1){ //Every column
+            Tile[] oneCol = new Tile[size];
+            for (int j = 0; j < size; j += 1) {
+                oneCol[j] = board.tile(i, j);
+            }
+            changed = moveOneColumn(i, oneCol) || changed;
+        }
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        board.setViewingPerspective(Side.NORTH);
 
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
+    }
+
+    /** just move a group, like, four tiles in a column */
+    public boolean moveOneColumn(int col, Tile[] list){
+        boolean moved = false;
+        int targetPlace = list.length - 1;
+        int lastValue = 0;
+
+        for(int i = list.length - 1; i >= 0; i -= 1){
+            if(list[i] == null){
+                continue;
+            }
+            /** Use last value of tile to Update the target place to move to.
+             *  lastValue == 0 means can't merge.
+             *  After merge, set lastValue to 0.
+             */
+            if(lastValue != 0){
+                if(list[i].value() != lastValue){
+                    targetPlace -= 1;
+                    lastValue = list[i].value();
+                }else {
+                    lastValue = 0;
+                }
+            }else{
+                lastValue = list[i].value();
+            }
+
+            if(targetPlace != i){
+                moved = true;
+                boolean merge = board.move(col, targetPlace, list[i]);
+                if(merge){
+                    score += (list[i].value() * 2);
+                    targetPlace -= 1;
+                }
+            }
+        }
+        return moved;
     }
 
     /** Checks if the game is over and sets the gameOver variable
@@ -137,8 +187,17 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
-        return false;
+        int size = b.size();
+        boolean emptySpace = false;
+        for(int i = 0; i < size; i += 1){
+            for(int j = 0; j < size; j += 1){
+                if (b.tile(i, j) == null) {
+                    emptySpace = true;
+                    break;
+                }
+            }
+        }
+        return emptySpace;
     }
 
     /**
@@ -147,8 +206,17 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
-        return false;
+        int size = b.size();
+        boolean maxTile = false;
+        for(int i = 0; i < size; i += 1){
+            for(int j = 0; j < size; j += 1){
+                if (b.tile(i, j) != null && b.tile(i, j).value() == MAX_PIECE) {
+                    maxTile = true;
+                    break;
+                }
+            }
+        }
+        return maxTile;
     }
 
     /**
@@ -158,7 +226,27 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        if (emptySpaceExists(b)) {
+            return true;
+        }
+        int size = b.size();
+        for(int i = 0; i < size - 1; i += 1){
+            for(int j = 0; j < size - 1; j += 1){
+                int base = b.tile(i, j).value();
+                int right = b.tile(i + 1, j).value();
+                int down = b.tile(i, j + 1).value();
+                if (base == right || base == down) {
+                    return true;
+                }
+            }
+        }
+        int lastbase = b.tile(size - 1, size - 1).value();
+        int top = b.tile(size - 1, size - 2).value();
+        int left = b.tile(size - 2, size - 1).value();
+        if(lastbase == top || lastbase == left){
+            return true;
+        }
+
         return false;
     }
 
