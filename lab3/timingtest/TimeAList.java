@@ -24,14 +24,14 @@ public class TimeAList {
     public static void timeAListConstruction() {
         AList<Integer> Ns = new AList<>();
         int START_N = 1000;// 1000, 2000, 4000, 8000, 16000, 32000, 64000
-        int END_N = 12800000; // 64000 or 128000; depends on Hardware
+        int END_N = 128000; // 64000 or 128000; depends on Hardware
         int ITEM_ADDED = 1;
         AList<Double> times = new AList<>();
         for (int k = START_N; k <= END_N; k = k * 2) {
             Ns.addLast(k);
 
-            Stopwatch sw = new Stopwatch();
             AList<Integer> lst = new AList<>();
+            Stopwatch sw = new Stopwatch();
             for (int j = 0; j < k; j += 1) {
                 lst.addLast(ITEM_ADDED);
             }
