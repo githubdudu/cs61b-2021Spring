@@ -2,6 +2,8 @@ package deque;
 
 import org.junit.Test;
 
+import java.util.Iterator;
+
 import static org.junit.Assert.*;
 
 public class ArrayDequeTest {
@@ -73,8 +75,8 @@ public class ArrayDequeTest {
     /* Check if you can create ArrayDeques with different parameterized types*/
     public void multipleParamTest() {
 
-        ArrayDeque<String>  lld1 = new ArrayDeque<String>();
-        ArrayDeque<Double>  lld2 = new ArrayDeque<Double>();
+        ArrayDeque<String> lld1 = new ArrayDeque<String>();
+        ArrayDeque<Double> lld2 = new ArrayDeque<Double>();
         ArrayDeque<Boolean> lld3 = new ArrayDeque<Boolean>();
 
         lld1.addFirst("string");
@@ -128,8 +130,10 @@ public class ArrayDequeTest {
         }
 
         for (int i = 0; i < 10; i++) {
-            assertEquals((int)lld1.get(i), i);
+            assertEquals((int) lld1.get(i), i);
         }
+        assertNull(lld1.get(10));
+        assertNull(lld1.get(100001));
 
         ArrayDeque<Integer> lld2 = new ArrayDeque<>();
         for (int i = 0; i < 100000; i++) {
@@ -137,8 +141,62 @@ public class ArrayDequeTest {
         }
 
         for (int i = 0; i < 100000; i++) {
-            assertEquals((int)lld2.get(i), i);
+            assertEquals((int) lld2.get(i), i);
         }
 
+        assertNull(lld2.get(100000));
+
+    }
+
+    @Test
+    public void equalsTest() {
+        ArrayDeque<Integer> lld1 = new ArrayDeque<>();
+        ArrayDeque<Integer> lld2 = new ArrayDeque<>();
+
+        assertTrue(lld1.equals(lld2));
+        assertTrue(lld2.equals(lld1));
+        for (int i = 0; i < 100000; i++) {
+            lld1.addLast(i);
+            lld2.addLast(i);
+            assertTrue("wrong equal", lld1.equals(lld2));
+            assertTrue(lld2.equals(lld1));
+        }
+    }
+
+    @Test
+    public void iteratorTest() {
+        ArrayDeque<Integer> lld1 = new ArrayDeque<>();
+        lld1.addLast(1);
+        lld1.addLast(2);
+        lld1.addLast(3);
+        Iterator iter = lld1.iterator();
+        assertEquals(1, iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals(2, iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals(3, iter.next());
+        assertFalse(iter.hasNext());
+        assertNull(iter.next());
+    }
+
+    @Test
+    public void resizeTest() {
+        ArrayDeque<Integer> lld1 = new ArrayDeque<>();
+
+        for (int i = 0; i < 8; i++) {
+            lld1.addLast(i);
+        }
+
+        for (int i = 0; i < 7; i++) {
+            lld1.removeFirst();
+        }
+
+        for (int i = 0; i < 64; i++) {
+            lld1.addLast(i);
+        }
+
+        for (int i = 0; i < 63; i++) {
+            lld1.removeFirst();
+        }
     }
 }

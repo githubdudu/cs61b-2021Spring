@@ -2,6 +2,8 @@ package deque;
 
 import org.junit.Test;
 
+import java.util.Iterator;
+
 import static org.junit.Assert.*;
 
 
@@ -135,6 +137,8 @@ public class LinkedListDequeTest {
         for (int i = 0; i < 10; i++) {
             assertEquals((int)lld1.get(i), i);
         }
+        assertNull(lld1.get(10));
+        assertNull(lld1.get(100001));
 
         LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
         for (int i = 0; i < 100000; i++) {
@@ -144,6 +148,7 @@ public class LinkedListDequeTest {
         for (int i = 0; i < 100000; i++) {
             assertEquals((int)lld2.get(i), i);
         }
+        assertNull(lld2.get(100000));
 
     }
 
@@ -169,5 +174,36 @@ public class LinkedListDequeTest {
             assertEquals((int)lld2.getRecursive(i), i);
         }
 
+    }
+
+    @Test
+    public void equalsTest() {
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
+        LinkedListDeque<Integer> lld2 = new LinkedListDeque<>();
+
+        assertTrue(lld1.equals(lld2));
+        assertTrue(lld2.equals(lld1));
+        for (int i = 0; i < 100000; i++) {
+            lld1.addLast(i);
+            lld2.addLast(i);
+            assertTrue("wrong equal", lld1.equals(lld2));
+            assertTrue(lld2.equals(lld1));
+        }
+    }
+
+    @Test
+    public void iteratorTest() {
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
+        lld1.addLast(1);
+        lld1.addLast(2);
+        lld1.addLast(3);
+        Iterator iter = lld1.iterator();
+        assertEquals(1, iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals(2, iter.next());
+        assertTrue(iter.hasNext());
+        assertEquals(3, iter.next());
+        assertFalse(iter.hasNext());
+        assertNull(iter.next());
     }
 }
