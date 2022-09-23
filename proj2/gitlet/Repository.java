@@ -1,11 +1,9 @@
 package gitlet;
 
 import java.io.File;
-import java.util.HashMap;
 
 import static gitlet.Utils.*;
 
-// TODO: any imports you need here
 
 /** Represents a gitlet repository.
  *

@@ -22,6 +22,7 @@ public class Flow {
     private static final String COMMIT_MSG_MISSING = "Please enter a commit message.";
     private static final String NO_CHANGES = "No changes added to the commit.";
     private static final String NO_REASON_TO_REMOVE = "No reason to remove the file.";
+    private static final String FOUND_NO_COMMITS_WITH_THAT_MSG = "Found no commit with that message.";
 
 
     public Flow(String[] args) {
@@ -75,7 +76,7 @@ public class Flow {
             /** Prepare a blob for file */
             Blob blob = new Blob(filename);
 
-            blob.save();
+            blob.fileToBlob();
             index.add(blob);
         } else {
             exitWithInfo(FILE_NOT_EXIST);
@@ -122,7 +123,7 @@ public class Flow {
         // Delete source file if traced in commit
         if(lastCommit.hasFile(filename)) {
             Blob blob = new Blob(filename);
-            blob.deleteInWorkingDIR();
+            blob.deleteFile();
         // remove will return value. If no key exist, return null
         } else if(index.remove(filename) == null) {
             exitWithInfo(NO_REASON_TO_REMOVE);
@@ -142,6 +143,7 @@ public class Flow {
         }
     }
 
+    /** Log all the files in COMMITS_DIR */
     public void globalLog() {
         checkArgsAndEnv(1);
 
@@ -152,7 +154,73 @@ public class Flow {
         }
     }
 
+    /*
+     * Find by the message, not hash.
+     * The instructions on Website guide is misleading.
+     * This is just same as "git log --grep=word"
+     */
+    public void find() {
+        checkArgsAndEnv(2);
 
+        String message = args[1];
+        Boolean found = false;
+        List<String> commitsList = plainFilenamesIn(COMMITS_DIR);
+        for (String commitHash: commitsList) {
+            Commit commit = Commit.readFromHash(commitHash);
+            if(commit.getMessage().contains(message)) {
+                found = true;
+                System.out.println(commitHash);
+            };
+        }
+        if(!found) {
+            exitWithInfo(FOUND_NO_COMMITS_WITH_THAT_MSG);
+        }
+    }
+
+    public void status() {
+
+    }
+
+    public void checkout() {
+        if(args.length == 2) {
+            checkoutBranch(args[1]);
+        } else if(args.length == 3 && args[1].equals("--")) {
+            checkout(args[2]);
+        } else if(args.length == 4 && args[2].equals("--")) {
+            checkout(args[1], args[3]);
+        } else {
+            exitWithInfo(INCORRECT_PARA);
+        }
+    }
+
+    /** Checkout the last Commit version of file. */
+    private void checkout(String filename) {
+        checkArgsAndEnv(3);
+
+        try{
+            Commit lastCommit = readLastCommit();
+            lastCommit.recoverFile(filename);
+        } catch (GitletException e) {
+            exitWithInfo(e.getMessage());
+        }
+    }
+
+    /** Checkout the Specified Commit version of file. */
+    private void checkout(String commitHash, String filename) {
+        checkArgsAndEnv(4);
+
+        try {
+            Commit specifiedCommit = Commit.readFromHash(commitHash);
+            specifiedCommit.recoverFile(filename);
+        } catch (GitletException e) {
+            exitWithInfo(e.getMessage());
+    }
+    }
+
+    private void checkoutBranch(String filename) {
+        checkArgsAndEnv(2);
+
+    }
 
 
     public void exitWithInfo(String info) {

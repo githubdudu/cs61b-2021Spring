@@ -18,6 +18,8 @@ import java.util.Locale;
  */
 public class Commit implements Serializable {
 
+    private static final String FILE_DOES_NOT_EXIST_IN_COMMITS = "File does not exist in that commit.";
+    private static final String NO_COMMITS_WITH_ID = "No commit with that id exists.";
     /** Last commit hashcode */
     private String parentHash;
     /** The timestamp of this Commit. The timestamp for initial commit is 0(in Unix). */
@@ -71,11 +73,23 @@ public class Commit implements Serializable {
         return files.hasSameFile(b);
     }
 
+    public void recoverFile(String filename) {
+        /** Use "try-catch" in case the blob is not exist, or not in commit */
+        try {
+            files.recoverFile(filename);
+        } catch (GitletException e) {
+            throw error(FILE_DOES_NOT_EXIST_IN_COMMITS);
+        }
+    }
     public String getParentHash() {
         return parentHash;
     }
 
-    public void log() {
+    public String getMessage() {
+        return message;
+    }
+
+    public void log() { //TODO the merge case
         System.out.println(toString());
     }
 
@@ -88,9 +102,13 @@ public class Commit implements Serializable {
         return formatter.format("Date: %1$ta %1$tb %1$td %1$tT %1$tY %1$tz\n%2$s", timestamp, message).toString();
     }
 
+
     public static Commit readFromHash(String hashcode) {
         File commit = join(Repository.COMMITS_DIR, hashcode);
-        return readObject(commit, Commit.class);
+        if (commit.exists()) {
+            return readObject(commit, Commit.class);
+        } else {
+            throw error(NO_COMMITS_WITH_ID);
+        }
     }
-
 }

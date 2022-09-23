@@ -23,9 +23,9 @@ public class Main {
             case "rm" -> flow.rm();
             case "log" -> flow.log();
             case "global-log" -> flow.globalLog();
-            case "find" -> System.out.println("find");
-            case "status" -> System.out.println("status");
-            case "checkout" -> System.out.println("checkout");
+            case "find" -> flow.find();
+            case "status" -> flow.status();
+            case "checkout" -> flow.checkout();
             case "branch" -> System.out.println("branch");
             case "rm-branch" -> System.out.println("rm-branch");
             case "reset" -> System.out.println("reset");

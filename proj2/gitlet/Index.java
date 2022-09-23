@@ -3,8 +3,7 @@ package gitlet;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import static gitlet.Utils.readObject;
-import static gitlet.Utils.writeObject;
+import static gitlet.Utils.*;
 
 public class Index implements Serializable {
     /**
@@ -33,7 +32,7 @@ public class Index implements Serializable {
     }
 
     public boolean hasFile(Blob b) {
-        return hasFile(b.getSourceName());
+        return hasFile(b.getFilename());
     }
 
     public boolean hasSameFile(String filename, String hashcode) {
@@ -41,11 +40,11 @@ public class Index implements Serializable {
     }
 
     public boolean hasSameFile(Blob b) {
-        return hasSameFile(b.getSourceName(), b.getHashcode());
+        return hasSameFile(b.getFilename(), b.getHashcode());
     }
 
     public String add(Blob b) {
-        index.put(b.getSourceName(), b.getHashcode());
+        index.put(b.getFilename(), b.getHashcode());
         save();
         return b.getHashcode();
     }
@@ -55,6 +54,15 @@ public class Index implements Serializable {
         String remove = index.remove(filename);
         save();
         return remove;
+    }
+
+    public void recoverFile(String filename) {
+        if(hasFile(filename)) {
+            Blob blob = new Blob(filename, index.get(filename));
+            blob.blobToFile();
+        } else {
+            throw error("File does not exist in that index.");
+        }
     }
 
     public void save() {
