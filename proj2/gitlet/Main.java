@@ -1,24 +1,36 @@
 package gitlet;
 
-/** Driver class for Gitlet, a subset of the Git version-control system.
- *  @author TODO
+/**
+ * Driver class for Gitlet, a subset of the Git version-control system.
+ *
+ * @author dudu
  */
 public class Main {
 
-    /** Usage: java gitlet.Main ARGS, where ARGS contains
-     *  <COMMAND> <OPERAND1> <OPERAND2> ... 
+    /**
+     * Usage: java gitlet.Main ARGS, where ARGS contains
+     * <COMMAND> <OPERAND1> <OPERAND2> ...
+     * As an entry. The args checks are in Flow.java.
      */
     public static void main(String[] args) {
-        // TODO: what if args is empty?
+        Flow flow = new Flow(args);
+
         String firstArg = args[0];
-        switch(firstArg) {
-            case "init":
-                // TODO: handle the `init` command
-                break;
-            case "add":
-                // TODO: handle the `add [filename]` command
-                break;
-            // TODO: FILL THE REST IN
+        switch (firstArg) {
+            case "init" -> flow.init();
+            case "add" -> flow.add();
+            case "commit" -> flow.commit();
+            case "rm" -> flow.rm();
+            case "log" -> flow.log();
+            case "global-log" -> flow.globalLog();
+            case "find" -> System.out.println("find");
+            case "status" -> System.out.println("status");
+            case "checkout" -> System.out.println("checkout");
+            case "branch" -> System.out.println("branch");
+            case "rm-branch" -> System.out.println("rm-branch");
+            case "reset" -> System.out.println("reset");
+            case "merge" -> System.out.println("merge");
+            default -> flow.exitWithInfo(Flow.NO_EXIST_PARA);
         }
     }
 }
