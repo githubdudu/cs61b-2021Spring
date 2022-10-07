@@ -1,0 +1,22 @@
+Enter # strings to insert into the maps: sdududua
+Please enter a positive integer: 1000000
+--Stack Overflow -- couldn't add 1000000 strings of length 8.
+class bstmap.BSTMap: 1.23 sec
+Java's Built-in TreeMap: 1.09 sec
+Java's Built-in HashMap: 0.53 sec
+Would you like to try more timed-tests? (y/n)y
+
+Enter # strings to insert into the maps: sdududua
+Please enter a positive integer: 100000
+--Stack Overflow -- couldn't add 100000 strings of length 8.
+class bstmap.BSTMap: 0.08 sec
+Java's Built-in TreeMap: 0.10 sec
+Java's Built-in HashMap: 0.05 sec
+Would you like to try more timed-tests? (y/n)y
+
+Enter # strings to insert into the maps: aaaabbbb
+Please enter a positive integer: 10000
+class bstmap.ULLMap: 0.29 sec
+class bstmap.BSTMap: 0.00 sec
+Java's Built-in TreeMap: 0.00 sec
+Java's Built-in HashMap: 0.00 sec
