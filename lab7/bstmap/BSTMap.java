@@ -2,6 +2,7 @@ package bstmap;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
@@ -16,22 +17,22 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public boolean containsKey(K k) {
-        if (tree == null) {
-            return false;
-        }
-        return tree.getKey(k) != null;
+        return get(k, tree) != null;
     }
 
     @Override
     public V get(K k) {
-        if (tree == null) {
-            return null;
-        }
-        BSTNode node = tree.getKey(k);
-        if (node == null) {
-            return null;
-        }
+        BSTNode node = get(k, tree);
+        if (node == null) return null;
         return node.value;
+    }
+
+    private BSTNode get(K k, BSTNode node) {
+        if (node == null) return null;
+        int cmp = k.compareTo(node.key);
+        if (cmp < 0) return get(k, node.left);
+        else if (cmp > 0) return get(k, node.right);
+        else return node;
     }
 
     @Override
@@ -41,14 +42,19 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public void put(K k, V v) {
-        if (tree == null) {
-            tree = new BSTNode(k, v);
-            size = 1;
-        } else {
-            int count = tree.setKey(k, v);
-            size += count;
-        }
+        tree = put(k, v, tree);
+    }
 
+    private BSTNode put(K k, V v, BSTNode node) {
+        if (node == null) {
+            size += 1;
+            return new BSTNode(k, v);
+        }
+        int cmp = k.compareTo(node.key);
+        if (cmp < 0) node.left = put(k, v, node.left);
+        else if (cmp > 0) node.right = put(k, v, node.right);
+        else node.value = v;
+        return node;
     }
 
     public void printInOrder() {
@@ -71,77 +77,108 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         BSTNode left;
         BSTNode right;
 
-        BSTNode(K k, V v, BSTNode left, BSTNode right) {
-            key = k;
-            value = v;
-            this.left = left;
-            this.right = right;
-        }
-
-
         BSTNode(K k, V v) {
             key = k;
             value = v;
             left = null;
             right = null;
         }
-
-        public BSTNode getKey(K k) {
-            if (k.equals(key)) {
-                return this;
-            } else if (k.compareTo(key) < 0) {
-                if (left != null) {
-                    return left.getKey(k);
-                }
-                return null;
-            } else {
-                if (right != null) {
-                    return right.getKey(k);
-                }
-                return null;
-            }
-        }
-
-        /* Return 0 if no key added, return 1 if one more key added */
-        public int setKey(K k, V v) {
-            if (k.equals(key)) {
-                value = v;
-                return 0;
-            } else if (k.compareTo(key) < 0) {
-                if (left != null) {
-                    return left.setKey(k, v);
-                } else {
-                    left = new BSTNode(k, v);
-                    return 1;
-                }
-            } else {
-                if (right != null) {
-                    return right.setKey(k, v);
-                } else {
-                    right = new BSTNode(k, v);
-                    return 1;
-                }
-            }
-        }
     }
 
+    /* Below is optional for Lab 7 */
     @Override
     public Set<K> keySet() {
-        throw new UnsupportedOperationException();
+        Set<K> keySet = new TreeSet();
+        addToKeySet(keySet, tree);
+        return keySet;
+    }
+
+    private void addToKeySet(Set<K> set, BSTNode node) {
+        if (node != null) {
+            addToKeySet(set, node.left);
+            set.add(node.key);
+            addToKeySet(set, node.right);
+        }
     }
 
     @Override
-    public V remove(K key) {
-        throw new UnsupportedOperationException();
+    /* If key doesn't exist, return null */
+    public V remove(K k) {
+        BSTNode node = get(k, tree);
+        V v;
+        if (node == null) {
+            v = null;
+        } else {
+            size -= 1;
+            v = node.value;
+        }
+
+        tree = remove(k, tree);
+        return v;
+    }
+
+    private BSTNode remove(K k, BSTNode node) {
+        if (node == null) return null;
+
+        int cmp = k.compareTo(node.key);
+        if (cmp < 0) node.left = remove(k, node.left);
+        else if (cmp > 0) node.right = remove(k, node.right);
+        else {
+            if (node.right == null) return node.left;
+            if (node.left == null) return node.right;
+            BSTNode temp = node;
+            node = min(temp.right);
+            node.right = removeMin(temp.right);
+            node.left = temp.left;
+
+        }
+        return node;
+    }
+
+    private BSTNode min(BSTNode node) {
+        if (node.left == null) return node;
+        else return min(node.left);
+    }
+
+    private BSTNode removeMin(BSTNode node) {
+        return remove(min(node).key, node);
     }
 
     @Override
-    public V remove(K key, V value) {
-        throw new UnsupportedOperationException();
+    public V remove(K k, V v) {
+        BSTNode node = get(k, tree);
+        V value;
+        if (node == null || node.value != v) {
+            value = null;
+        } else {
+            size -= 1;
+            value = node.value;
+            tree = remove(k, tree);
+        }
+
+        return value;
     }
 
     @Override
+    /* Iterator over the keys */
     public Iterator<K> iterator() {
-        throw new UnsupportedOperationException();
+        class BSTMapIterator implements Iterator<K> {
+            /* Use Broad Priority Search */
+            private final Iterator<K> iter = keySet().iterator();
+
+            public boolean hasNext() {
+                return iter.hasNext();
+            }
+
+            public K next() {
+                BSTNode node = get(iter.next(), tree);
+                if (node != null) {
+                    return node.key;
+                }
+                return null;
+            }
+        }
+
+        return new BSTMapIterator();
     }
 }
