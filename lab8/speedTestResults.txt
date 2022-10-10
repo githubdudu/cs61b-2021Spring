@@ -1,0 +1,29 @@
+sdududua
+Please enter a positive integer: 100000
+class hashmap.MyHashMapALBuckets: 0.17 sec
+class hashmap.MyHashMapLLBuckets: 0.34 sec
+class hashmap.MyHashMapTSBuckets: 0.33 sec
+class hashmap.MyHashMapHSBuckets: 0.27 sec
+class hashmap.MyHashMapPQBuckets: 0.25 sec
+
+Would you like to try more timed-tests? (y/n)y
+
+Enter # strings to insert into each map: sdududua
+Please enter a positive integer: 500000
+class hashmap.MyHashMapALBuckets: 1.08 sec
+class hashmap.MyHashMapLLBuckets: 1.72 sec
+class hashmap.MyHashMapTSBuckets: 2.68 sec
+class hashmap.MyHashMapHSBuckets: 1.68 sec
+class hashmap.MyHashMapPQBuckets: 2.87 sec
+
+Enter # strings to insert into hashmap.MyHashMap: 1234567890abc
+Please enter a positive integer: 10000
+class hashmap.MyHashMap: 0.03 sec
+
+Enter # strings to insert into Java's HashMap: 1234567890abc
+Please enter a positive integer: 10000
+Java's Built-in HashMap: 0.01 sec
+
+Enter # strings to insert into hashmap.ULLMap: 1234567890abc
+Please enter a positive integer: 10000
+class hashmap.ULLMap: 2.03 sec
