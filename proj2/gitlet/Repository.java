@@ -71,12 +71,21 @@ public class Repository {
         return join(CWD, filename).exists();
     }
 
+    /** For the branch HEAD points to*/
     public static String getLastCommitHash() {
-        String headPath = readContentsAsString(HEAD_FILE);
-        // Parse path string
-        String branchName = headPath.substring(headPath.lastIndexOf("/") + 1);
+        return getLastCommitHash(getDefaultBranchName());
+    }
+    /** For the specified branch */
+    public static String getLastCommitHash(String branchName) {
         File branchHead = join(REFS_HEAD_DIR, branchName);
         return readContentsAsString(branchHead);
+    }
+
+    private static String getDefaultBranchName() {
+        String headPath = readContentsAsString(HEAD_FILE);
+        String branchName = headPath.substring(headPath.lastIndexOf("/") + 1);
+
+        return branchName;
     }
 
     public static Commit readLastCommit() {

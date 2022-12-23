@@ -217,8 +217,15 @@ public class Flow {
     }
     }
 
-    private void checkoutBranch(String filename) {
+    private void checkoutBranch(String branchName) {
         checkArgsAndEnv(2);
+
+        String branchLastCommitHash = getLastCommitHash(branchName);
+        Commit branchLastCommit = Commit.readFromHash(branchLastCommitHash);
+
+        // Recover all the files
+        // Reset Index
+        // Reset HEAD
 
     }
 
