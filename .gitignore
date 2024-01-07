@@ -3,6 +3,8 @@
 !**.java
 !**.txt
 !**.json
+!README.md
+!exercisesInGuide/**
 !**/pom.xml
 !.fatweleminus
 !.gitignore
