@@ -13,11 +13,11 @@ public static Dog maxDog(Dog d1, Dog d2) {
     return d2;
 }
 ```
-
+Solution:  
 Here is the command line info when try "javac dog.java".
 ```shell
->> javac dog.java
-dog.java:19: error: non-static variable weightInPounds cannot be referenced from a static context
+$ javac dog.java
+>>dog.java:19: error: non-static variable weightInPounds cannot be referenced from a static context
 if (weightInPounds > d2.weightInPounds) {
     ^                                    
 dog.java:20: error: non-static variable this cannot be referenced from a static context
@@ -49,12 +49,12 @@ public class DogLoop {
     }
 }
 ```
-
+Solution:  
 Compile successfully with ```javac dog.java dogloop.java```.  
 Run with error.
 ```shell
->> java DogLoop
-bark. bark.
+$ java DogLoop
+>>bark. bark.
 woof!
 woof!
 Exception in thread "main" java.lang.NullPointerException: Cannot read field "weightInPounds" because "<parameter1>" is null
@@ -79,7 +79,7 @@ In the below code what would the blank variable name have to be in order for the
    }
  }
 ```
-
+Solution:
 ```java 
  public class Human{
    int eyes;
@@ -87,4 +87,42 @@ In the below code what would the blank variable name have to be in order for the
      eyes = initEyes;
    }
  }
+```
+## B Level
+### 1
+Below is the Dog class.
+```java
+public class Dog{
+    public void bark(){
+        System.out.println("Moo");
+    }
+    public static void runFast(){
+        System.out.println("Ruff Run");
+    }
+}
+```
+Which of the following lines, if any, would cause an error.
+```java
+Dog poppa = new Dog();
+poppa.bark();
+Dog.bark(); // error
+poppa.runFast();
+Dog.runFast();
+```
+Solution:  
+Only an instance of a class can call not-static methods.  
+Both class and instances can call static methods.
+```shell
+$ javac DogLauncher.java
+>>doglauncher.java:5: error: non-static method bark() cannot be referenced from a static context
+        Dog.bark();
+           ^
+1 error
+```
+Comment the error line, then compile and run, the command line will print:
+```shell
+$java DogLauncher
+>>Moo
+Ruff Run
+Ruff Run
 ```
