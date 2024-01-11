@@ -1,4 +1,5 @@
-# Lists2 Study Guide - Exercises
+# Lec4: Lists2 Study Guide - Exercises
+Ref: https://sp21.datastructur.es/materials/lectures/lec4/lec4
 ## C Level
 ### 1
 Complete the exercises from the online textbook.
@@ -74,13 +75,37 @@ If the sentinel node was a null node, would it change anything or would the Intl
 
 Quite not sure what this question is asking. It is the SSList has sentinel, or the IntNode connects with sentinel. 
 
-If the question is asking about the SSList: It would change everything. The SLList would not be able to function.
+It may asking about the Intlist inside the SSList: It would change everything. The Intlist would not be able to function. Because the sentinel node -- a null node -- is not able to point to another node.
 
 ## A level
 ### 1
 Do problem 5 from midterm 1 in Kartik’s textbook
 
+Ref: https://www.kartikkapur.com/documents/mt1.pdf#page=7
+
+5   Osmosis (10 pts)
+
+We want to add a method to IntList so that if 2 numbers in a row are the same, we add them together and
+make one large node. For example:
+1 → 1 → 2 → 3 becomes 2 → 2 → 3 which becomes 4 → 3
+
+```java
+public class IntList {
+    public int first ;
+    public IntList rest ;
+    public IntList ( int f , IntList r ) {
+    . . .
+    }
+    public void addAdjacent ( ) {
+    }
+}
+```
+
+
+
 **Answer:**
+
+See code repo.
 
 ### 2
 Modify the Intlist class so that every time you add a value you “square” the IntList. For example, upon the insertion of 5, the below IntList would transform from:
@@ -94,4 +119,6 @@ and if 7 was added to the latter IntList, it would become
 Additionally, you are provided the constraint that you can only access the size() function one time during the entire process of adding a node.
 
 **Answer:**
+
+See code repo.
 
