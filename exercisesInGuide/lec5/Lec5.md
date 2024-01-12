@@ -106,7 +106,7 @@ Ref: https://sp21.datastructur.es/materials/lectures/lec5/lec5
       pilates.cards = newArrWhoDis; //p-{2, 2, 4, 1, 3} d-{2, 2, 4, 1, 3}
       newArrWhoDis = null; // p-{2, 2, 4, 1, 3} d-{2, 2, 4, 1, 3}
    ```
-
+   **Answer:** In the comments.
 2. Say we have a 2 dimensional DList. We want this 2-D DList to be as even as possible. To do this we will try to fill up rows as uniformly as possible- meaning that not row will have a greater size than any other row by more than 1 element. Write a method that will take in a sub DList and add the given element if it fulfills the constraints. If the constraints are not fulfilled, the item will be attempted to be put in the DList below the one you attempted to insert in originally and so forth until the bottom most DList is reached in which case move to the top DList.
 
    **Answer:** 
@@ -118,4 +118,20 @@ Ref: https://sp21.datastructur.es/materials/lectures/lec5/lec5
 ### A level
 
 1. Complete problem 10 from practice midterm 1 in Kartik’s [textbook](http://www.kartikkapur.com/documents/mt1.pdf#page=10)
+
+   **Answer:** coding
+
+   ==There is a critical typo in question code, line 12.==
+
+   ==It should be ```width```, not ```p.length```.==
+
+   This would be a great misleading if there is ```p.length```. 
+
+   For **part c**, it is really hard to know what the question giver wants and his meaning. 
+   From the solution pdf we can know that, he wants us to use `arraycopy()` to deal with result of `sortHalfLong()`.
+   I couldn't figure it out. I thought should this be used to implement a merge sort with some trick or something? I nearly wrote a sort method myself. 
+
 2. Complete problem 7 from midterm 1 from Spring 2015 [here](https://tbp.berkeley.edu/exams/4695/download/#page=9)
+
+   **Answer:** coding
+
