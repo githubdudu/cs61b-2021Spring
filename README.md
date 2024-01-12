@@ -11,7 +11,7 @@ This a repo of assignments (including labs and projects) and exercises answers
 > There is ONLY one valuable blog that contains exercises, although not covering most of the questions but it covers the whole courses: [Study Notes | Forkercat](https://www.junhaow.com/studynotes/#cs-61b-data-structures)
 >
 
-
+> Many of the exercises are from pdf of previous exams, there is not the details of the question in the guide page.  I have collected the pdf so there is no need to bother copying the descriptions of questions from pdf.
 
 Ref:
 
