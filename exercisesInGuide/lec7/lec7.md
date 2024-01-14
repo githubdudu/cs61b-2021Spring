@@ -27,4 +27,4 @@ See the corresponding code. The code shows that this methods can cover every cas
 ### 2
 If we have 2 objects, Object o1 and Object o2, that have identical qualities, will assertEquals(o1, o2) assert true or false?
 
-Answer: 
+Answer:  It will throw an error which means they are not equal. Like the golden rule said, the equality is verified by value that is physical address which is not equal.

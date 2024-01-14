@@ -26,6 +26,8 @@ Ref: https://sp21.datastructur.es/materials/lectures/lec6/lec6
 
    > Bonus question: What is the maximum number of array boxes that Java will track at any given time? Assume that "garbage collection" happens immediately when all references to an object are lost.
 
+   **answer: **
+
    Java will track 100 array boxes to 1000 array boxes during this period. When resizing, the boxes tracked will be temporarily doubled as N *2 +1.
 
    
