@@ -64,12 +64,34 @@ Ref: https://sp21.datastructur.es/materials/lectures/lec9/lec9
 
    Is this valid? If so explain why Poodle is a Dog if Dog has no constructor with no argument. If it is not valid then explain how we can make it valid.
 
+   **Answer:**  It's about constructor invocation. Java would automatically invoke the no argument superclass constructor (`super()`) for subclass if the super constructor has not been called explicitly.  
+
+   Here in the question, there is no default `Dog()`.
+
+   Way to correct it: 
+
+   1. Add `Dog()` in superclass, or;
+
+   2. Add explicit call to `Dog(int weight_in_pounds)`
+
+      ```java
+          public Poodle(int weight) {
+              super(weight)
+          }
+      ```
+
+      
+
 2. The `Monkey` class is a subclass of the `Animal` class and the `Dog` class is a subclass of the `Animal` class. However a Dog is not a Monkey nor is a Monkey a Dog. What will happen for the following code? Assume that the constructors are all formatted properly.
 
-   ```
+   ```java
     Monkey jimmy = new Monkey("Jimmy");
     Dog limmy = (Dog) jimmy;
    ```
+
+   **Answer:** there would be a compilation error. Casting can only cast up or cast down.
+
+   > Inconvertible types; cannot cast 'Monkey' to 'Dog'.
 
 3. How about for this code?
 
@@ -80,8 +102,41 @@ Ref: https://sp21.datastructur.es/materials/lectures/lec9/lec9
 
    Provide brief explanation as to why you believe your answers to be correct.
 
+   **Answer:** Can pass compile check. It fit the cast up and cast down rule. Because casting overrule compiler type checking.
+
+   It will throw an exception during run-time.
+
+   > class Monkey cannot be cast to class Dog
+
 ### Past Exam Questions
 
 [Spring 2018 MT1Q3](https://tbp.berkeley.edu/exams/5990/download/#page=5)
 
+**Answer:** 
+
+![1705415267250](G:\code\cs61b\skeleton-sp21\exercisesInGuide\lec9\assets\1705415267250.png)
+
+
+
+UK runs
+UK runs
+UK runs
+
+UK runs
+UK runs
+USK runs
+
+Compile Error
+Compile Error
+UF runs
+
+No error
+UK runs
+UK runs
+Runtime Error
+
+
+
 [Spring 2017 MT1Q4](https://tbp.berkeley.edu/exams/5975/download/#page=5)
+
+Exactly the question in lec8 exercise. 
