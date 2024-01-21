@@ -4,11 +4,23 @@ Ref: https://sp21.datastructur.es/materials/lectures/lec14/lec14
 
 ## Recommended Problems
 
+> The so-called Textbook below refers to *Algorithms, 4th Edition* by Wayne and Sedgewick.
+
+> Found out these study guides about algorithms are copied from Princeton lectures. https://www.cs.princeton.edu/courses/archive/fall14/cos226/lectures.php
+
 ### C level
 
 1. [Problem 2a](https://tbp.berkeley.edu/exams/5286/download/) from Spring 2016 midterm #2.
+
+   **Answer:** in the pdf file.
+
 2. [Problem 1d](https://tbp.berkeley.edu/exams/5239/download/) from Spring 2015 midterm #1.
 
+   > It must be Problem 1d from Spring 2015 midterm ***#2***. Since problem 1 in midterm #1 is about Java class.
+
+   **Answer:** in the pdf file.
+
+> Below answers are in the pdf file except A.4.
 ### B level
 
 1. [Problem 1](http://www.cs.princeton.edu/courses/archive/spring15/cos226/exams/mid-f11.pdf) from the Princeton Fall 2011 midterm.
