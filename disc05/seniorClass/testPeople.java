@@ -3,7 +3,7 @@ public class testPeople {
         Person n = new Person("Neil", 12);
         Person a = new Grandma("Ada", 60);
         Grandma v = new Grandma("Vidya", 80);
-
+        // Grandma al = new Person(null, 0) // compile error
         n.greet(a);
         n.greet(v);
         v.greet(a);
@@ -13,6 +13,6 @@ public class testPeople {
         a.greet(v);
 
         ((Grandma) a).greet(v);
-//        ((Grandma) n).greet(v);
+//        ((Grandma) n).greet(v); // runtime error
     }
 }

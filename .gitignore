@@ -6,6 +6,7 @@
 !**.json
 !README.md
 !exercisesInGuide/**
+!cs61b.code-workspace
 !**/pom.xml
 !.fatweleminus
 !.gitignore
