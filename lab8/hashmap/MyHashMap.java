@@ -153,23 +153,37 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         }
     }
 
-    private void resize(){
-        if((size + 1) >= loadFactor * tableSize){
+    private void resize() {
+        if ((size + 1) >= loadFactor * tableSize) {
             tableSize *= 2;
             Collection<Node>[] newBuckets = createTable(tableSize);
-            for(Collection<Node> bucket: buckets) {
-                for(Node node : bucket) {
+            for (Collection<Node> bucket : buckets) {
+                for (Node node : bucket) {
                     Collection<Node> newBucket = newBuckets[hash(node.key)];
                     newBucket.add(node);
                 }
             }
             buckets = newBuckets;
         }
-    };
+    }
 
+    ;
+
+    // TOdo: Implement the methods remove(K key) and remove(K key, V value), in your MyHashMap class.
+    // TOdo: For an extra challenge, implement keySet() and iterator without using a second instance variable to store the set of keys.
+//    @Override
+//    public Set<K> keySet() {
+//        return keySet;
+//    }
     @Override
     public Set<K> keySet() {
-        return keySet;
+        Set<K> keyset = new HashSet<>();
+        for (Collection<Node> bucket : buckets) {
+            for (Node node : bucket) {
+                keyset.add(node.key);
+            }
+        }
+        return keyset;
     }
 
     @Override
@@ -179,11 +193,28 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     @Override
     public V remove(K key) {
-        throw new UnsupportedOperationException();
+
+        V value = get(key);
+
+        return value == null ? null : remove(key, value);
     }
 
     @Override
     public V remove(K key, V value) {
-        throw new UnsupportedOperationException();
+        Collection<Node> bucket = buckets[hash(key)];
+        V answer = null;
+        for (Node node : bucket) {
+            if (node.key.equals(key) && node.value.equals(value)) {
+                // Save the value
+                answer = node.value;
+
+                // Remove
+                bucket.remove(node);
+                keySet.remove(node.key);
+                break;
+            }
+        }
+
+        return answer;
     }
 }
