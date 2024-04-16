@@ -1,8 +1,8 @@
 package gitlet;
 
 import java.io.File;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Date;
+import java.util.Map;
 
 import static gitlet.Utils.*;
 
@@ -32,26 +32,59 @@ public class Repository {
      * The .gitlet directory.
      */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
+    /**
+     * The branch pointer directory -- ".gitlet/heads/"
+     */
     public static final File BRANCH_DIR = join(GITLET_DIR, "heads");
-
+    /**
+     * The blobs directory -- ".gitlet/objects/"
+     */
     public static final File BLOBS_DIR = join(GITLET_DIR, "objects");
-
+    /**
+     * The commits object directory -- ".gitlet/commits/"
+     */
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
 
+    /**
+     * The HEAD pointer
+     */
+    public static final File HEAD_POINTER = join(GITLET_DIR, "HEAD");
+    /**
+     * The index file for staging.
+     */
+    public static final File INDEX = join(GITLET_DIR, "index");
     /* TODO: fill in the rest of this class. */
     public static void init() {
         initGitletFolder();
-        Commit commit = new Commit();
+
+        // Create the init commit
+        StagingArea initStage = new StagingArea();
+        Date initDate = new Date(0);
+        String initMessage = "initial commit";
+
+        Commit commit = new Commit(initStage, initDate, initMessage);
         String commitHash = commit.saveCommit();
 
-        File branch = join(GITLET_DIR, "heads/master");
-        writeContents(branch, commitHash);
+        // Create a master branch and save it.
+        // Save the hash of commit as the content of branch head
+        Branch defaultBranch = new Branch();
+        defaultBranch.setContent(commitHash);
+        defaultBranch.saveFile();
 
-        File head = join(GITLET_DIR, "HEAD");
-        writeContents(head, branch.getPath() + "master");
+        // Create a HEAD pointer.
+        // Save the relative path of saved branch object to pointer HEAD
+        saveTheHEAD(defaultBranch);
+        // TODO: get the relative path from two absulute paths.
     }
 
-    public static void initGitletFolder() {
+    private static void saveTheHEAD(Branch branch) {
+        writeContents(HEAD_POINTER, branch.getBranchFileRelativePath());
+    }
+
+    /**
+     * Create as many as the folders that used in a gitlet system.
+     */
+    private static void initGitletFolder() {
         if (GITLET_DIR.exists()) {
             System.out.println("A Gitlet version-control system already exists in the current" +
                     " directory.");
@@ -59,15 +92,9 @@ public class Repository {
         }
 
         GITLET_DIR.mkdir();
-
-        File file = join(GITLET_DIR, "heads");
-        file.mkdir();
-
-        file = join(GITLET_DIR, "objects");
-        file.mkdir();
-
-        file = join(GITLET_DIR, "commits");
-        file.mkdir();
+        BRANCH_DIR.mkdir();
+        BLOBS_DIR.mkdir();
+        COMMITS_DIR.mkdir();
     }
 
     public static void add(String filename) {
@@ -80,22 +107,13 @@ public class Repository {
         // Calculate the sha1 for the file
         String fileHash = sha1(readContents(file));
 
-        // Read from current commit
+        // Read the index from current commit
+
+        // Read the index from current staging index
+
+        // Search the fileHash in these indexes.
 
 
-
-        // Read from staging file
-        File stagingFile = join(GITLET_DIR, "staging");
-        TreeSet<String> stagingArea;
-        if (stagingFile.exists()) {
-            stagingArea = readObject(stagingFile, TreeSet.class);
-        } else {
-            stagingArea = new TreeSet<>();
-        }
-
-        if(stagingArea.contains(fileHash)) {
-
-        }
     }
 
 }

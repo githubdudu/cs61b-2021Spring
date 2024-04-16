@@ -66,14 +66,15 @@ public class Main {
             // TODO: FILL THE REST IN
             // A not exist command.
             default:
-                throw Utils.error("No command with that name exists.");
+                System.out.println("No command with that name exists.");
+                System.exit(0);
 
         }
     }
 
     public static void validateNumArgs(String cmd, String[] args, int n) {
         if (args.length != n) {
-            System.out.println("Incorrect operands");
+            System.out.println("Incorrect operands.");
             System.exit(0);
         }
     }

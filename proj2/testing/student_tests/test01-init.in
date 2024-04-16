@@ -1,0 +1,19 @@
+# Wrong number or format of operands
+> init something
+Incorrect operands.
+<<<
+
+# Basic initialization
+> init
+<<<
+E .gitlet
+E .gitlet/commits
+E .gitlet/heads
+E .gitlet/heads/master
+E .gitlet/objects
+E .gitlet/HEAD
+
+# Failure cases
+> init
+A Gitlet version-control system already exists in the current directory.
+<<<

@@ -2,10 +2,9 @@ package gitlet;
 
 // TODO: any imports you need here
 
-import java.io.File;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Date;
+import java.util.Map;
 
 import static gitlet.Utils.*;
 
@@ -21,30 +20,25 @@ public class Commit implements Serializable {
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided one example for `message`.
      */
-    /** The folder stores commits */
-    static final File COMMIT_FOLDER = join(Repository.GITLET_DIR, "commits");
-    /** The files contained in this Commit. */
-    private Set<String> files;
+
+    /** The file names and hash pairs contained in this Commit. */
+    private Map<String, String> files;
     /** The time stamp of this Commit. Using The (Unix) Epoch. */
-    private int time;
+    private Date date;
 
     /** The message of this Commit. */
     private String message;
 
-    public Commit() {
-        this(new HashSet<String>(), 0, "initial commit");
-    }
-
-    public Commit(Set<String> files, int time, String message) {
-        this.files = files;
-        this.time = time;
+    public Commit(StagingArea stage, Date date, String message) {
+        this.files = stage.getIndex();
+        this.date = date;
         this.message = message;
     }
 
     /* TODO: fill in the rest of this class. */
     public String saveCommit() {
         String hash = Utils.sha1(serialize(this));
-        writeObject(join(COMMIT_FOLDER, hash), this);
+        writeObject(join(Repository.COMMITS_DIR, hash), this);
         return hash;
     }
 }
