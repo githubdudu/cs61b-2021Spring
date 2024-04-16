@@ -1,92 +1,101 @@
 package gitlet;
 
 import java.io.File;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static gitlet.Utils.*;
 
+// TODO: any imports you need here
 
-/** Represents a gitlet repository.
+/**
+ * Represents a gitlet repository.
+ *  TODO: It's a good idea to give a description here of what else this Class
+ *  does at a high level.
  *
- *  Abstract the code just like in the lab 6.
- *  @author dudu
+ * @author Dudu
  */
 public class Repository {
     /**
-     * Do required filesystem operations to allow for persistence.
-     * (creates any necessary folders or files)
+     * TODO: add instance variables here.
      *
-     * .gitlet/ -- top level folder for all gitlet
-     *    - objects/ -- folder containing all of blobs and commits.
-     *    - objects/commits -- folder containing all of commits.
-     *    - refs/heads -- folder containing the branches info. File name is branch name, and contents is hashcode of commits.
-     *    - index/ -- folder containing the stage files.
-     *    - HEAD -- file containing the head ref.
+     * List all instance variables of the Repository class here with a useful
+     * comment above them describing what that variable represents and how that
+     * variable is used. We've provided two examples for you.
      */
 
-    /** The current working directory. */
+    /**
+     * The current working directory.
+     */
     public static final File CWD = new File(System.getProperty("user.dir"));
-    /** The .gitlet directory. */
+    /**
+     * The .gitlet directory.
+     */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-    /** The objects directory. Saving objects. */
-    public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
-    /** The commits directory. Saving commits. */
-    public static final File COMMITS_DIR = join(GITLET_DIR, "objects", "commits");
-    /** The reference directory. Save pairs of hashcode and name */
-    public static final File REFS_DIR = join(GITLET_DIR, "refs");
-    public static final File REFS_HEAD_DIR = join(GITLET_DIR, "refs", "heads");
-    /** The stage file. Save the staged file info */
-    public static final File STAGE_FILE = join(GITLET_DIR, "index");
-    /** The HEAD file. */
-    public static final File HEAD_FILE = join(GITLET_DIR, "HEAD");
+    public static final File BRANCH_DIR = join(GITLET_DIR, "heads");
 
+    public static final File BLOBS_DIR = join(GITLET_DIR, "objects");
 
-    public static boolean isInitialized() {
-        // In git source code, there is a soft test for a "look-like" git directory
-        // Includes: - an objects/ directory, - a refs/ directory, - a HEAD file
-        if (!GITLET_DIR.exists() || !COMMITS_DIR.exists() || !REFS_HEAD_DIR.exists() || !HEAD_FILE.exists()) {
-            return false;
+    public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
+
+    /* TODO: fill in the rest of this class. */
+    public static void init() {
+        initGitletFolder();
+        Commit commit = new Commit();
+        String commitHash = commit.saveCommit();
+
+        File branch = join(GITLET_DIR, "heads/master");
+        writeContents(branch, commitHash);
+
+        File head = join(GITLET_DIR, "HEAD");
+        writeContents(head, branch.getPath() + "master");
+    }
+
+    public static void initGitletFolder() {
+        if (GITLET_DIR.exists()) {
+            System.out.println("A Gitlet version-control system already exists in the current" +
+                    " directory.");
+            System.exit(0);
         }
-        // Check HEAD file
-        if (!isHeadFileValid()) {
-            return false;
+
+        GITLET_DIR.mkdir();
+
+        File file = join(GITLET_DIR, "heads");
+        file.mkdir();
+
+        file = join(GITLET_DIR, "objects");
+        file.mkdir();
+
+        file = join(GITLET_DIR, "commits");
+        file.mkdir();
+    }
+
+    public static void add(String filename) {
+        File file = join(CWD, filename);
+        if (!file.exists()) {
+            System.out.println("File does not exist.");
+            System.exit(0);
         }
-        return true;
+
+        // Calculate the sha1 for the file
+        String fileHash = sha1(readContents(file));
+
+        // Read from current commit
+
+
+
+        // Read from staging file
+        File stagingFile = join(GITLET_DIR, "staging");
+        TreeSet<String> stagingArea;
+        if (stagingFile.exists()) {
+            stagingArea = readObject(stagingFile, TreeSet.class);
+        } else {
+            stagingArea = new TreeSet<>();
+        }
+
+        if(stagingArea.contains(fileHash)) {
+
+        }
     }
 
-    private static boolean isHeadFileValid() { // TODO
-        return true;
-    }
-
-    public static void setBranch(String branch, String hashcode) {
-        File f = join(REFS_HEAD_DIR, branch);
-        writeContents(f, hashcode);
-    }
-
-    public static void setHead(String path) {
-        // Set HEAD
-        writeContents(HEAD_FILE, path);
-    }
-
-    public static boolean fileExist(String filename) {
-        return join(CWD, filename).exists();
-    }
-
-    public static String getLastCommitHash() {
-        String headPath = readContentsAsString(HEAD_FILE);
-        // Parse path string
-        String branchName = headPath.substring(headPath.lastIndexOf("/") + 1);
-        File branchHead = join(REFS_HEAD_DIR, branchName);
-        return readContentsAsString(branchHead);
-    }
-
-    public static Commit readLastCommit() {
-        return Commit.readFromHash(getLastCommitHash());
-    }
-
-    public static void logCommit(String hashcode, Commit commit) {
-        System.out.println("===");
-        System.out.println("commit " + hashcode);
-        commit.log();
-        System.out.println();
-    }
 }
