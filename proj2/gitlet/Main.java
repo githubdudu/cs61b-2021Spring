@@ -65,6 +65,10 @@ public class Main {
                 Repository.addCommand(args[1]);
                 break;
             // TODO: FILL THE REST IN
+            case "commit":
+                validateNumArgs("commit", args, 2);
+                Repository.commitCommand(args[1]);
+                break;
             // A not exist command.
             default:
                 System.out.println("No command with that name exists.");

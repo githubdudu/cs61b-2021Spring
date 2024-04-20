@@ -87,7 +87,7 @@ public class Repository {
 
 
     /**
-     * gitlet add command.
+     * gitlet add [filename] command.
      * <p>
      * <ol>
      * <li>Read the file to be added.</li>
@@ -100,6 +100,8 @@ public class Repository {
      * and the index from current commit.
      * <p>
      * In real git, multiple files may be added at once. In gitlet, only one file may be added at a time.
+     * <p>
+     * Failure cases: File does not exist.
      *
      * @param filename the file to be added
      */
@@ -112,8 +114,11 @@ public class Repository {
             System.exit(0);
         }
 
-        // Calculate the sha1 for the file
+        // Save file and calculate the sha1 of the file
         String fileHash = sha1(readContents(file));
+        if (!BLOBS_DIR.exists()) {
+            BLOBS_DIR.mkdir();
+        }
         File blobFile = join(BLOBS_DIR, fileHash);
         if (!blobFile.exists()) {
             writeContents(blobFile, readContents(file));
@@ -123,6 +128,62 @@ public class Repository {
         StagingArea indexStaging = StagingArea.readFromFile();
         indexStaging.updateIndex(filename, fileHash);
         indexStaging.saveStagingToFile();
+
+    }
+
+    /**
+     * gitlet commit [message] command.
+     * <ol>
+     *     <li>Just save the latest index as new commit. </li>
+     *     <ol>
+     *         <li>If the index of current is identical to the index from latest commit, abort
+     *         this commit. </li>
+     *         <li>If the commit message is blank, print error. Abort. </li>
+     *         <li>Save the latest index. </li>
+     *     </ol>
+     *     <li>Update branch head. </li>
+     * </ol>
+     * Failure cases:
+     * <p>
+     * 1. If no files have been staged, abort. Print the message "No changes added to
+     * the commit."
+     * <p>
+     * 2. Every commit must have a non-blank message. If it doesn't, print the error
+     * message "Please enter a commit message."
+     * <p>
+     * It is not a failure for tracked files to be missing from the working directory or changed
+     * in the working directory. Just ignore everything outside the .gitlet directory entirely.
+     * <p></p>
+     * <p>
+     * Differences from real git: In real git, commits may have multiple parents (due to merging)
+     * and also have considerably more metadata.
+     *
+     * @param message commit message. Must be non-blank.
+     */
+    public static void commitCommand(String message) {
+        // Read the index from current commit.
+        Commit lastCommit = Commit.readCommitFromFile(getLastCommitHash());
+        StagingArea indexFromCommit = lastCommit.getStaging();
+
+        // Read the index from current staging index.
+        StagingArea indexStaging = StagingArea.readFromFile();
+
+        // Failure case 1
+        if (indexFromCommit.equals(indexStaging)) {
+            System.out.println("No changes added to the commit.");
+        }
+
+        // Failure case 2
+        if (message.isEmpty()) {
+            System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
+
+        Commit newCommit = new Commit(indexStaging, new Date(), message);
+        String hash = newCommit.saveCommitToFile();
+
+        String branchFile = Arrays.toString(readContents(Repository.HEAD_POINTER));
+        writeContents(join(BRANCH_DIR, branchFile), hash);
 
     }
 

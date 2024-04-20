@@ -56,4 +56,23 @@ public class StagingArea implements Serializable {
     public Map<String, String> getIndex() {
         return index;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        StagingArea that = (StagingArea) o;
+
+        return index.equals(that.index);
+    }
+
+    @Override
+    public int hashCode() {
+        return index.hashCode();
+    }
 }

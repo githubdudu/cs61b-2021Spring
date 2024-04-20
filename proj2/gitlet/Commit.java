@@ -45,6 +45,9 @@ public class Commit implements Serializable {
      */
     public String saveCommitToFile() {
         String hash = Utils.sha1(serialize(this));
+        if (!Repository.COMMITS_DIR.exists()) {
+            Repository.COMMITS_DIR.mkdir();
+        }
         writeObject(join(Repository.COMMITS_DIR, hash), this);
         return hash;
     }
