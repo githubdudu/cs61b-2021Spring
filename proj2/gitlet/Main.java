@@ -3,7 +3,7 @@ package gitlet;
 /**
  * Driver class for Gitlet, a subset of the Git version-control system.
  *
- * @author Dudu
+ * @author hdon694
  */
 public class Main {
 
@@ -29,10 +29,11 @@ public class Main {
      * <p>
      * There are some failure cases you need to handle that don’t apply to a particular command.
      * Here they are:
-     * <li>1. If a user doesn’t input any arguments, print the message {@code Please enter a command.}
+     * <li>1. If a user doesn't input any arguments, print the message
+     * {@code Please enter a command.}
      * and exit. </li>
      *
-     * <li>2. If a user inputs a command that doesn’t exist, print the message {@code No command
+     * <li>2. If a user inputs a command that doesn't exist, print the message {@code No command
      * with that name exists.} and exit.</li>
      *
      * <li>3. If a user inputs a command with the wrong number or format of operands, print the
@@ -56,12 +57,12 @@ public class Main {
             case "init":
                 // handle the `init` command
                 validateNumArgs("init", args, 1);
-                Repository.init();
+                Repository.initCommand();
                 break;
             case "add":
                 // handle the `add [filename]` command
                 validateNumArgs("add", args, 2);
-                Repository.add(args[1]);
+                Repository.addCommand(args[1]);
                 break;
             // TODO: FILL THE REST IN
             // A not exist command.
@@ -72,6 +73,13 @@ public class Main {
         }
     }
 
+    /**
+     * A helper function validates the number of arguments.
+     *
+     * @param cmd  command name
+     * @param args the actual arguments
+     * @param n    expected count of the arguments
+     */
     public static void validateNumArgs(String cmd, String[] args, int n) {
         if (args.length != n) {
             System.out.println("Incorrect operands.");

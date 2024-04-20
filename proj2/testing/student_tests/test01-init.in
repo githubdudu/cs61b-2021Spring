@@ -11,7 +11,10 @@ E .gitlet/commits
 E .gitlet/heads
 E .gitlet/heads/master
 E .gitlet/objects
-E .gitlet/HEAD
+E .gitlet/HEADER
+E .gitlet/index
+= .gitlet/HEADER header.txt
+
 
 # Failure cases
 > init

@@ -1,18 +1,15 @@
 package gitlet;
 
-// TODO: any imports you need here
-
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
 
 import static gitlet.Utils.*;
 
-/** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
+/**
+ * Represents a gitlet commit object. Helper to read and write Commit file/object and get staging
+ * file from commit.
  *
- *  @author TODO
+ * @author hdon694
  */
 public class Commit implements Serializable {
     /**
@@ -21,24 +18,53 @@ public class Commit implements Serializable {
      * variable is used. We've provided one example for `message`.
      */
 
-    /** The file names and hash pairs contained in this Commit. */
-    private Map<String, String> files;
-    /** The time stamp of this Commit. Using The (Unix) Epoch. */
+    /**
+     * The staging snap in this Commit.
+     */
+    private StagingArea staging;
+    /**
+     * The time stamp of this Commit. Using The (Unix) Epoch.
+     */
     private Date date;
 
-    /** The message of this Commit. */
+    /**
+     * The message of this Commit.
+     */
     private String message;
 
-    public Commit(StagingArea stage, Date date, String message) {
-        this.files = stage.getIndex();
+    public Commit(StagingArea staging, Date date, String message) {
+        this.staging = staging;
         this.date = date;
         this.message = message;
     }
 
-    /* TODO: fill in the rest of this class. */
-    public String saveCommit() {
+    /**
+     * Save commit instance to file under COMMITS_DIR directory, file name is the hash of instance.
+     *
+     * @return hash of the file.
+     */
+    public String saveCommitToFile() {
         String hash = Utils.sha1(serialize(this));
         writeObject(join(Repository.COMMITS_DIR, hash), this);
         return hash;
+    }
+
+    /**
+     * Read commit by its hash from COMMITS_DIR directory.
+     *
+     * @param hash The 40 length hash string of that commit object
+     * @return A Commit object
+     */
+    public static Commit readCommitFromFile(String hash) {
+        return readObject(join(Repository.COMMITS_DIR, hash), Commit.class);
+    }
+
+    /**
+     * Return the stage relates to this Commit.
+     *
+     * @return staging saved in Commit
+     */
+    public StagingArea getStaging() {
+        return staging;
     }
 }
