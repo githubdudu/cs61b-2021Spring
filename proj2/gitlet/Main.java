@@ -69,6 +69,9 @@ public class Main {
                 validateNumArgs("commit", args, 2);
                 Repository.commitCommand(args[1]);
                 break;
+            case "rm":
+                validateNumArgs("rm", args, 2);
+                Repository.rmCommand(args[1]);
             // A not exist command.
             default:
                 System.out.println("No command with that name exists.");

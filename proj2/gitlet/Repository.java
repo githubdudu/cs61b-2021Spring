@@ -115,13 +115,13 @@ public class Repository {
         }
 
         // Save file and calculate the sha1 of the file
-        String fileHash = sha1(readContents(file));
+        String fileHash = sha1(readContentsAsString(file));
         if (!BLOBS_DIR.exists()) {
             BLOBS_DIR.mkdir();
         }
         File blobFile = join(BLOBS_DIR, fileHash);
         if (!blobFile.exists()) {
-            writeContents(blobFile, readContents(file));
+            writeContents(blobFile, readContentsAsString(file));
         }
 
         // Read the index from current staging index, update, and then save.
@@ -184,6 +184,39 @@ public class Repository {
 
         String branchFile = Arrays.toString(readContents(Repository.HEAD_POINTER));
         writeContents(join(BRANCH_DIR, branchFile), hash);
+
+    }
+
+    /**
+     * Unstage the file if it is currently staged for addition. If the file is tracked in the
+     * current commit, stage it for removal and remove the file from the working directory if the
+     * user has not already done so (do not remove it unless it is tracked in the current commit).
+     * <p>
+     * Failure cases: If the file is neither staged nor tracked by the head commit, print the error
+     * message "No reason to remove the file."
+     *
+     * @param filename the name of the file to be removed from staging area.
+     */
+    public static void rmCommand(String filename) {
+        // Read the index from current commit.
+        Commit lastCommit = Commit.readCommitFromFile(getLastCommitHash());
+        StagingArea indexFromCommit = lastCommit.getStaging();
+
+        // Read the index from current staging index.
+        StagingArea indexStaging = StagingArea.readFromFile();
+
+        // Failure cases
+        if (!indexFromCommit.getIndex().containsKey(filename) && !indexStaging.getIndex().containsKey(
+                filename)) {
+            System.out.println("No reason to remove the file.");
+            System.exit(0);
+        }
+
+        indexStaging.getIndex().remove(filename);
+
+        if (indexFromCommit.getIndex().containsKey(filename)) {
+            restrictedDelete(filename);
+        }
 
     }
 

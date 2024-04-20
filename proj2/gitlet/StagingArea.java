@@ -49,14 +49,18 @@ public class StagingArea implements Serializable {
         index.put(fileName, fileHash);
     }
 
-    public void removeFile(String filename, String fileHash) {
-        index.remove(filename);
-    }
-
     public Map<String, String> getIndex() {
         return index;
     }
 
+    /**
+     * Compares the specified object with this stagingArea for equality. Returns true if the given
+     * object is also a StagingArea and the two stagingAreas have the same index. More formally,
+     * two stagingAreas s1 and s2 represent the same indexing if s1.index().equals(s2.index()).
+     *
+     * @param o object to be compared for equality with this stagingArea
+     * @return true if the specified object is equal to this stagingArea
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -71,6 +75,11 @@ public class StagingArea implements Serializable {
         return index.equals(that.index);
     }
 
+    /**
+     * Returns the hash code value for this stagingArea.
+     *
+     * @return the hash code value for this stagingArea
+     */
     @Override
     public int hashCode() {
         return index.hashCode();
