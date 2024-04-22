@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 
+import static gitlet.Utils.readContentsAsString;
 import static gitlet.Utils.writeContents;
 
 /**
@@ -65,12 +66,34 @@ public class Branch {
     }
 
     /**
+     * Return the Branch instance by a specified branch name. This method will read the saved
+     * branch file.
+     *
+     * @param branchName the branch name.
+     * @return the Branch instance specified by branch name.
+     */
+    public static Branch readFromFile(String branchName) {
+        Branch b = new Branch(branchName);
+        b.setContent(readContentsAsString(b.getBranchFile()));
+        return b;
+    }
+
+    /**
      * Get the name of branch.
      *
      * @return the name of branch.
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Get the File reference of this branch.
+     *
+     * @return the File reference of this branch.
+     */
+    public File getBranchFile() {
+        return branchFile;
     }
 
     /**

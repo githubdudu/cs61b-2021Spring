@@ -1,8 +1,10 @@
 package gitlet;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static gitlet.Utils.*;
 
@@ -62,7 +64,7 @@ public class Repository {
     public static void initCommand() {
         initGitletFolder();
 
-        // Create the indexing, aka staging area.
+        // Create the blank indexing, aka staging area.
         StagingArea initStage = new StagingArea();
         initStage.saveStagingToFile();
 
@@ -72,12 +74,12 @@ public class Repository {
 
         // Create and save initial commit.
         Commit commit = new Commit(initStage, initDate, initMessage);
-        String commitHash = commit.saveCommitToFile();
+        commit.saveCommitToFile();
 
         // Create a master branch and save it.
         // Save the hash of commit as the content of branch head.
         Branch defaultBranch = new Branch();
-        defaultBranch.setContent(commitHash);
+        defaultBranch.setContent(commit.getHash());
         defaultBranch.saveBranchToFile();
 
         // Create a HEAD pointer, HEADER.
@@ -162,11 +164,15 @@ public class Repository {
      */
     public static void commitCommand(String message) {
         // Read the index from current commit.
-        Commit lastCommit = Commit.readCommitFromFile(getLastCommitHash());
+        Commit lastCommit = Commit.readFromFile(getLastCommitHash());
         StagingArea indexFromCommit = lastCommit.getStaging();
 
         // Read the index from current staging index.
         StagingArea indexStaging = StagingArea.readFromFile();
+
+        // Read the branch from branch file.
+        String ref = readHEADERFromFile();
+        Branch branch = Branch.readFromFile(join(GITLET_DIR, ref).getName());
 
         // Failure case 1
         if (indexFromCommit.equals(indexStaging)) {
@@ -180,10 +186,11 @@ public class Repository {
         }
 
         Commit newCommit = new Commit(indexStaging, new Date(), message);
-        String hash = newCommit.saveCommitToFile();
+        newCommit.saveCommitToFile();
 
-        String branchFile = Arrays.toString(readContents(Repository.HEAD_POINTER));
-        writeContents(join(BRANCH_DIR, branchFile), hash);
+        // Move the pointer of branch
+        branch.setContent(newCommit.getHash());
+        branch.saveBranchToFile();
 
     }
 
@@ -199,7 +206,7 @@ public class Repository {
      */
     public static void rmCommand(String filename) {
         // Read the index from current commit.
-        Commit lastCommit = Commit.readCommitFromFile(getLastCommitHash());
+        Commit lastCommit = Commit.readFromFile(getLastCommitHash());
         StagingArea indexFromCommit = lastCommit.getStaging();
 
         // Read the index from current staging index.
@@ -218,6 +225,140 @@ public class Repository {
             restrictedDelete(filename);
         }
 
+    }
+
+    /**
+     * The first kind use of checkout, recover file from latest commit.
+     * <p>
+     * Just locate the ID of last commit, and call another checkoutCommand().
+     * <p>
+     * Failure cases:
+     * If the file does not exist in the previous commit, abort, printing the error
+     * message "File does not exist in that commit." Do not change the CWD.
+     *
+     * @param filename the name of file that to be recovered.
+     */
+    public static void checkoutCommand(String filename) {
+        checkoutCommand(getLastCommitHash(), filename);
+    }
+
+    /**
+     * The second kind use of checkout, recover file from a given commit.
+     * <p>
+     * Get the index of that commit. Read source file from blob folders and write target file in
+     * working directory.
+     * <p>
+     * <p>
+     * Failure cases:
+     * If no commit with the given id exists, print "No commit with that id exists."
+     * Otherwise, if the file does not exist in the given commit, print the same message as for
+     * failure case 1.
+     * Do not change the CWD.
+     *
+     * @param commitID the id of commit, can be 40 length hash or first 6 digits of hash.
+     * @param filename the name of file that to be recovered.
+     */
+    public static void checkoutCommand(String commitID, String filename) {
+        // Failure case
+        if (!join(COMMITS_DIR, commitID).exists()) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+
+        Commit source = Commit.readFromFile(commitID);
+        String targetFileID = source.getStaging().getIndex().get(filename);
+        // Failure case
+        if (targetFileID == null) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+        String content = readBlobContent(targetFileID);
+
+        writeContents(join(CWD, filename), content);
+    }
+
+
+    /**
+     * The third use of checkout, recover all the files from the head of the given branch.
+     * Checks of failure cases should be done before doing anything else.
+     * Takes all files in the commit at the head of the given branch, and puts them in the working
+     * directory, overwriting the versions of the files that are already there if they exist. Also,
+     * at the end of this command, the given branch will now be considered the current branch
+     * (HEAD). Any files that are tracked in the current branch but are not present in the
+     * checked-out branch are deleted. The staging area is cleared, unless the checked-out branch is
+     * the current branch.
+     * <p>
+     * Failure cases:
+     * If no branch with that name exists, print "No such branch exists."
+     * If that branch is the current branch, print "No need to checkout the current branch."
+     * If a working file is untracked in the current branch and would be overwritten by the
+     * checkout, print "There is an untracked file in the way; delete it, or add and commit it
+     * first." and exit; perform this check before doing anything else.
+     * For this check, it should:
+     * 1. Find the untracked files.
+     * 2. See if it will be overwritten by the checkout.
+     * Do not change the CWD.
+     *
+     * @param branchName the branch name.
+     */
+    public static void checkoutBranchCommand(String branchName) {
+        File branchFile = join(BRANCH_DIR, branchName);
+
+        // Failure case.
+        if (!branchFile.exists()) {
+            System.out.println("No such branch exists.");
+            System.exit(0);
+        }
+        // Read from target branch file.
+
+        Branch sourceBranch = Branch.readFromFile(branchName);
+        Commit sourceCommit = Commit.readFromFile(sourceBranch.getCommitHash());
+
+        // Get the name of current branch.
+        String currentBranchName = join(GITLET_DIR, readHEADERFromFile()).getName();
+        // Failure case. Check if two branches are same branch.
+        if (branchName.equals(currentBranchName)) {
+            System.out.println("No need to checkout the current branch.");
+            System.exit(0);
+        }
+
+        // Find the untracked file.
+        // The current commit.
+        Commit lastCommit = Commit.readFromFile(getLastCommitHash());
+        List<String> fileLists = plainFilenamesIn(CWD);
+        List<String> untrackedFileLists = new ArrayList<>();
+        if (fileLists != null) {
+            untrackedFileLists = fileLists.stream().filter((f) -> lastCommit.getStaging().getIndex().containsKey(
+                    f)).collect(Collectors.toList());
+
+        }
+
+        for (String untrackedFile : untrackedFileLists) {
+            if (sourceCommit.getStaging().getIndex().containsKey(untrackedFile)) {
+                System.out.println(
+                        "There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
+            }
+        }
+
+        // Overwriting the files that in the set from current commit.
+        for (String key : lastCommit.getStaging().getIndex().keySet()) {
+            if (sourceCommit.getStaging().getIndex().containsKey(key)) {
+                // Replace.
+                String id = sourceCommit.getStaging().getIndex().get(key);
+                String content = readContentsAsString(join(BLOBS_DIR, id));
+                writeContents(join(CWD, key), content);
+            } else {
+                // Remove.
+                restrictedDelete(join(CWD, key));
+            }
+        }
+
+        // Change HEADER and index
+        StagingArea newIndex = sourceCommit.getStaging();
+        newIndex.saveStagingToFile();
+
+        saveTheHEADER(branchFile);
     }
 
     /**
@@ -240,7 +381,7 @@ public class Repository {
 
 
         // Read the index from current commit
-        Commit lastCommit = Commit.readCommitFromFile(getLastCommitHash());
+        Commit lastCommit = Commit.readFromFile(getLastCommitHash());
         StagingArea indexFromCommit = lastCommit.getStaging();
     }
 
@@ -266,18 +407,50 @@ public class Repository {
      * @param branch the branch that the header is pointing to.
      */
     private static void saveTheHEADER(Branch branch) {
-        writeContents(HEAD_POINTER, branch.getBranchFileRelativePath());
+        String relativePath = Repository.GITLET_DIR.toPath().relativize(branch.getBranchFile().toPath()).toString();
+        writeContents(HEAD_POINTER, relativePath);
+    }
+
+
+    /**
+     * Save the file relative path into HEADER file.
+     *
+     * @param file the file to which the header is pointing. The file is either a branch file
+     *             that stores a commit hash, or just a commit object/file.
+     */
+    private static void saveTheHEADER(File file) {
+        String relativePath = Repository.GITLET_DIR.toPath().relativize(file.toPath()).toString();
+        writeContents(HEAD_POINTER, relativePath);
     }
 
     /**
-     * Get the hash of last commit.
+     * Return the content of HEADER, the ref of the branch file.
+     *
+     * @return the content of HEADER, the ref of the branch file.
+     */
+    private static String readHEADERFromFile() {
+        return readContentsAsString(Repository.HEAD_POINTER);
+    }
+
+    /**
+     * Get the hash of last commit from branch file.
      *
      * @return the hash string.
      */
     private static String getLastCommitHash() {
-        String branchFile = Arrays.toString(readContents(Repository.HEAD_POINTER));
-        String hash = Arrays.toString(readContents(join(Repository.BRANCH_DIR, branchFile)));
+        String ref = readHEADERFromFile();
+        String hash = readContentsAsString(join(Repository.GITLET_DIR, ref));
 
         return hash;
+    }
+
+    /**
+     * Return the content of file by specified id/hash.
+     *
+     * @param targetFileID id/hash of the file.
+     * @return the content of file.
+     */
+    private static String readBlobContent(String targetFileID) {
+        return readContentsAsString(join(BLOBS_DIR, targetFileID));
     }
 }

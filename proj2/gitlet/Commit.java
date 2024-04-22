@@ -40,16 +40,22 @@ public class Commit implements Serializable {
 
     /**
      * Save commit instance to file under COMMITS_DIR directory, file name is the hash of instance.
-     *
-     * @return hash of the file.
      */
-    public String saveCommitToFile() {
-        String hash = Utils.sha1(serialize(this));
+    public void saveCommitToFile() {
+
         if (!Repository.COMMITS_DIR.exists()) {
             Repository.COMMITS_DIR.mkdir();
         }
-        writeObject(join(Repository.COMMITS_DIR, hash), this);
-        return hash;
+        writeObject(join(Repository.COMMITS_DIR, getHash()), this);
+    }
+
+    /**
+     * Return hash of This Commit instance.
+     *
+     * @return hash of This Commit instance.
+     */
+    public String getHash() {
+        return Utils.sha1((Object) serialize(this));
     }
 
     /**
@@ -58,7 +64,7 @@ public class Commit implements Serializable {
      * @param hash The 40 length hash string of that commit object
      * @return A Commit object
      */
-    public static Commit readCommitFromFile(String hash) {
+    public static Commit readFromFile(String hash) {
         return readObject(join(Repository.COMMITS_DIR, hash), Commit.class);
     }
 
