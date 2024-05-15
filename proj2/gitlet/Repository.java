@@ -195,6 +195,8 @@ public class Repository {
     }
 
     /**
+     * gitlet rm [filename] command.
+     * <p>
      * Unstage the file if it is currently staged for addition. If the file is tracked in the
      * current commit, stage it for removal and remove the file from the working directory if the
      * user has not already done so (do not remove it unless it is tracked in the current commit).
@@ -228,6 +230,8 @@ public class Repository {
     }
 
     /**
+     * gitlet checkout -- [file name] command
+     * <p>
      * The first kind use of checkout, recover file from latest commit.
      * <p>
      * Just locate the ID of last commit, and call another checkoutCommand().
@@ -243,6 +247,8 @@ public class Repository {
     }
 
     /**
+     * gitlet checkout [commit id] -- [file name] command
+     * <p>
      * The second kind use of checkout, recover file from a given commit.
      * <p>
      * Get the index of that commit. Read source file from blob folders and write target file in
@@ -279,6 +285,9 @@ public class Repository {
 
 
     /**
+     * gitlet checkout [branch name] command
+     * <p>
+     *
      * The third use of checkout, recover all the files from the head of the given branch.
      * Checks of failure cases should be done before doing anything else.
      * Takes all files in the commit at the head of the given branch, and puts them in the working
@@ -385,6 +394,9 @@ public class Repository {
         StagingArea indexFromCommit = lastCommit.getStaging();
     }
 
+    //
+    // Below is helper method
+    //
 
     /**
      * Create as many as the folders that used in a gitlet system.

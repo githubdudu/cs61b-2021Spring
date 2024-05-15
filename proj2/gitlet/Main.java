@@ -15,10 +15,10 @@ public class Main {
      * <p>
      * Init -- Creates a new Gitlet version-control system in the current directory.
      * <p>
-     * Add -- Adds a copy of the file as it currently exists to the staging area (see the
+     * Add [filename] -- Adds a copy of the file as it currently exists to the staging area (see the
      * description of the <code>commit</code> command).
      * <p>
-     * Commit -- Saves a snapshot of tracked files in the current commit and staging area so they
+     * Commit [message] -- Saves a snapshot of tracked files in the current commit and staging area so they
      * can be restored at a later time, creating a new commit.
      * <p>
      * Checkout -- Checkout is a kind of general command that can do a few different things
@@ -26,16 +26,19 @@ public class Main {
      * <p>
      *  <ol>
      *     <li>
+     *        checkout -- [file name]
      *        Takes the version of the file as it exists in the head commit and puts it in the working
      *        directory, overwriting the version of the file that’s already there if there is one. The new
      *        version of the file is not staged.
      *     </li>
      *     <li>
+     *      checkout [commit id] -- [file name]
      *      Takes the version of the file as it exists in the commit with the given id, and puts it in
      *      the working directory, overwriting the version of the file that’s already there if there is
      *      one. The new version of the file is not staged.
      *     </li>
      *     <li>
+     *      checkout [branch name]
      *      Takes all files in the commit at the head of the given branch, and puts them in the working
      *      directory, overwriting the versions of the files that are already there if they exist. Also,
      *      at the end of this command, the given branch will now be considered the current branch
@@ -91,26 +94,32 @@ public class Main {
                 break;
             // TODO: FILL THE REST IN
             case "commit":
+                // handle the `commit [message]` command
                 validateNumArgs("commit", args, 2);
                 Repository.commitCommand(args[1]);
                 break;
             case "rm":
+                // handle the `rm [filename]` command
                 validateNumArgs("rm", args, 2);
                 Repository.rmCommand(args[1]);
                 break;
             case "checkout":
                 if (args[1].equals("--")) {
+                    // handle the `checkout -- [file name]` command
                     validateNumArgs("checkout", args, 3);
                     Repository.checkoutCommand(args[2]);
                 } else if (args[2].equals("--")) {
+                    // handle the `checkout [commitId] -- [file name]` command
                     validateNumArgs("checkout", args, 4);
                     Repository.checkoutCommand(args[1], args[3]);
                 } else {
+                    // handle the `checkout [branch name]` command
+                    // Also handle all incorrect operands
                     validateNumArgs("checkout", args, 2);
                     Repository.checkoutBranchCommand(args[1]);
                 }
                 break;
-                // A not exist command.
+                // Handle non-exist commands.
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);
