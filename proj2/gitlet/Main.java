@@ -47,7 +47,9 @@ public class Main {
      *      the current branch (see Failure cases below).
      *     </li>
      *  </ol>
-     *
+     * Log -- Starting at the current head commit, display information about each commit backwards
+     *        along the commit tree until the initial commit.
+     *        Following the first parent commit links, ignoring any second parents found in merge commits.
      * <p>
      * The place to store old copies of files and other metadata: ".gitlet".
      * <p>
@@ -118,6 +120,10 @@ public class Main {
                     validateNumArgs("checkout", args, 2);
                     Repository.checkoutBranchCommand(args[1]);
                 }
+                break;
+            case "log":
+                validateNumArgs("log", args, 1);
+                Repository.logCommand();
                 break;
                 // Handle non-exist commands.
             default:

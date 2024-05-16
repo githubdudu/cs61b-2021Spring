@@ -32,12 +32,26 @@ public class Commit implements Serializable {
      */
     private String message;
 
-    public Commit(StagingArea staging, Date date, String message) {
+    /**
+     * Parent commit in the commit tree.
+     */
+    private String parent;
+    /**
+     * For merge commits, they have two parent commits.
+     */
+    private String secondParent;
+
+    public Commit(StagingArea staging, Date date, String message, String parent) {
+        this(staging, date, message, parent, null);
+    }
+
+    public Commit(StagingArea staging, Date date, String message, String parent, String secondParent) {
         this.staging = staging;
         this.date = date;
         this.message = message;
+        this.parent = parent;
+        this.secondParent = secondParent;
     }
-
     /**
      * Save commit instance to file under COMMITS_DIR directory, file name is the hash of instance.
      */
@@ -75,5 +89,33 @@ public class Commit implements Serializable {
      */
     public StagingArea getStaging() {
         return staging;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public String getSecondParent() {
+        return secondParent;
+    }
+
+    public boolean isInitCommit() {
+        return parent == null;
+    }
+    public boolean isMerged() {
+        return secondParent == null;
+    }
+
+    @Override
+    public String toString() {
+        String template = isMerged() ? "" : String.format(
+                "%s %s%n",
+                parent.substring(0, 6),
+                secondParent.substring(0, 6));
+        return String.format(template + "Date: %1$ta %1$tb %1$td %1$tT %1$tY %1$tz%n%2$s", date, message);
+    }
+
+    public String formattedCommitHistory(String id) {
+        return String.format("===%ncommit %s%n%s%n", id, this);
     }
 }

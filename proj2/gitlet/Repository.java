@@ -73,7 +73,7 @@ public class Repository {
         String initMessage = "initial commit";
 
         // Create and save initial commit.
-        Commit commit = new Commit(initStage, initDate, initMessage);
+        Commit commit = new Commit(initStage, initDate, initMessage, getLastCommitHash());
         commit.saveCommitToFile();
 
         // Create a master branch and save it.
@@ -185,7 +185,7 @@ public class Repository {
             System.exit(0);
         }
 
-        Commit newCommit = new Commit(indexStaging, new Date(), message);
+        Commit newCommit = new Commit(indexStaging, new Date(), message, getLastCommitHash());
         newCommit.saveCommitToFile();
 
         // Move the pointer of branch
@@ -287,7 +287,7 @@ public class Repository {
     /**
      * gitlet checkout [branch name] command
      * <p>
-     *
+     * <p>
      * The third use of checkout, recover all the files from the head of the given branch.
      * Checks of failure cases should be done before doing anything else.
      * Takes all files in the commit at the head of the given branch, and puts them in the working
@@ -371,6 +371,36 @@ public class Repository {
     }
 
     /**
+     * gitlet log command.
+     * <p>
+     * Shows commit’s history. Display commits with the most recent at the top.
+     *
+     * <li>There is a === before each commit and an empty line after it. </li>
+     * <li>As in real Git, each entry displays the unique SHA-1 id of the commit object. </li>
+     * <li>The timestamps displayed in the commits reflect the current timezone, not UTC.
+     * Your timezone might be different depending on where you live, and that’s fine.</li>
+     * <li>For merge commits (those that have two parent commits), add a line just below the first.
+     * where the two hexadecimal numerals following “Merge:” consist of
+     * the first seven digits of the first and second parents’ commit ids, in that order.
+     * The first parent is the branch you were on when you did the merge; the second is that of the merged-in branch. </li>
+     *
+     * <p>Error cases: No</p>
+     * <p>Utilize Commit.toString() method</p>
+     * <p>Commits history is a linked list data structure</p>
+     */
+
+    public static void logCommand() {
+        String hash = getLastCommitHash();
+        while (true) {
+            Commit commit = Commit.readFromFile(hash);
+            System.out.println(commit.formattedCommitHistory(hash));
+
+            if(commit.isInitCommit()) break;
+            hash = commit.getParent();
+        }
+    }
+
+    /**
      * TODO:
      * <li>Compare these indexes (HashMap) to decide whether:</li>
      *  <ol>
@@ -450,10 +480,14 @@ public class Repository {
      * @return the hash string.
      */
     private static String getLastCommitHash() {
-        String ref = readHEADERFromFile();
-        String hash = readContentsAsString(join(Repository.GITLET_DIR, ref));
+        try {
+            String ref = readHEADERFromFile();
+            String hash = readContentsAsString(join(Repository.GITLET_DIR, ref));
 
-        return hash;
+            return hash;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
