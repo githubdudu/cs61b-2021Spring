@@ -177,6 +177,7 @@ public class Repository {
         // Failure case 1
         if (indexFromCommit.equals(indexStaging)) {
             System.out.println("No changes added to the commit.");
+            System.exit(0);
         }
 
         // Failure case 2
@@ -222,6 +223,7 @@ public class Repository {
         }
 
         indexStaging.getIndex().remove(filename);
+        indexStaging.saveStagingToFile();
 
         if (indexFromCommit.getIndex().containsKey(filename)) {
             restrictedDelete(filename);

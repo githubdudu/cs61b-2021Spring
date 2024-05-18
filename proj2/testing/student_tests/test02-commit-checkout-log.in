@@ -1,0 +1,99 @@
+I definitions.inc
+> init
+<<<
+
+# Failure case of commit
+# Should fail because without commit message
+> commit
+Incorrect operands.
+<<<
+
+# Should fail because no file have been staged
+> commit "some random commit message"
+No changes added to the commit.
+<<<
+
+# Should fail because blank message
++ wug.txt wug.txt
+> add wug.txt
+<<<
+> commit ""
+Please enter a commit message.
+<<<
+
+# Make one commit and check the log
+> commit "wug1 added"
+<<<
+> log
+===
+${COMMIT_HEAD}
+wug1 added
+
+===
+${COMMIT_HEAD}
+initial commit
+
+<<<*
+
+# Make another commit and check the log
++ wug2.txt wug.txt
+> add wug2.txt
+<<<
+> commit "wug2 added"
+<<<
+> log
+===
+${COMMIT_HEAD}
+wug2 added
+
+===
+${COMMIT_HEAD}
+wug1 added
+
+===
+${COMMIT_HEAD}
+initial commit
+
+<<<*
+
+# Try rm
+> rm
+Incorrect operands.
+<<<
+# Try rm non-exist file
+> rm notwug.txt
+No reason to remove the file.
+<<<
+# Try rm non-staged file
++ notwug.txt wug.txt
+> rm notwug.txt
+No reason to remove the file.
+<<<
+E notwug.txt
+E wug.txt
+E wug2.txt
+
+# Try rm staged file
+> add notwug.txt
+<<<
+> rm notwug.txt
+<<<
+> commit "nothing commit"
+No changes added to the commit.
+<<<
+E notwug.txt
+E wug.txt
+E wug2.txt
+
+# Try rm tracked file
+> rm wug.txt
+<<<
+E notwug.txt
+* wug.txt
+E wug2.txt
+
+# try checkout after rm wug.txt
+> checkout -- wug.txt
+<<<
+E wug.txt
+= wug.txt wug.txt
