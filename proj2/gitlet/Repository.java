@@ -385,7 +385,6 @@ public class Repository {
      * <p>Utilize Commit.toString() method</p>
      * <p>Commits history is a linked list data structure</p>
      */
-
     public static void logCommand() {
         String hash = getLastCommitHash();
         while (true) {
@@ -394,6 +393,21 @@ public class Repository {
 
             if (commit.isInitCommit()) break;
             hash = commit.getParent();
+        }
+    }
+
+    /**
+     * gitlet global-log command.
+     * Like log, except displays information about all commits ever made. The order of the commits does not matter.
+     */
+    public static void globalLogCommand() {
+        List<String> commitFiles = plainFilenamesIn(COMMITS_DIR);
+        if (commitFiles == null) {
+            return;
+        }
+        for (String commitFile : commitFiles) {
+            Commit commit = Commit.readFromFile(commitFile);
+            System.out.println(commit.formattedCommitHistory(commitFile));
         }
     }
 

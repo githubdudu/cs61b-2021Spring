@@ -51,6 +51,8 @@ public class Main {
      *        along the commit tree until the initial commit.
      *        Following the first parent commit links, ignoring any second parents found in merge commits.
      * <p>
+     * Global-log -- Like log, except displays information about all commits ever made.
+     * <p>
      * The place to store old copies of files and other metadata: ".gitlet".
      * <p>
      * Some commands have failure cases with a specified error message.
@@ -125,7 +127,11 @@ public class Main {
                 validateNumArgs("log", args, 1);
                 Repository.logCommand();
                 break;
-                // Handle non-exist commands.
+            case "global-log":
+                validateNumArgs("global-log", args, 1);
+                Repository.globalLogCommand();
+                break;
+            // Handle non-exist commands.
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);
