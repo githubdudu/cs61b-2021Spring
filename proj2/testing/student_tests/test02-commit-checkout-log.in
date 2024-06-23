@@ -56,7 +56,9 @@ initial commit
 
 <<<*
 
-# Try rm
+# Test 'rm' command
+
+# Try rm without operands
 > rm
 Incorrect operands.
 <<<

@@ -1,10 +1,10 @@
 package gitlet;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import static gitlet.Utils.*;
 
@@ -263,17 +263,18 @@ public class Repository {
      * failure case 1.
      * Do not change the CWD.
      *
-     * @param commitID the id of commit, can be 40 length hash or first 6 digits of hash.
+     * @param commitID the id of commit, can be 40 full-length hash or shorter hash.
      * @param filename the name of file that to be recovered.
      */
     public static void checkoutCommand(String commitID, String filename) {
+        String commitIDLength40 = getFullCommentID(commitID);
         // Failure case
-        if (!join(COMMITS_DIR, commitID).exists()) {
+        if (!join(COMMITS_DIR, commitIDLength40).exists()) {
             System.out.println("No commit with that id exists.");
             System.exit(0);
         }
 
-        Commit source = Commit.readFromFile(commitID);
+        Commit source = Commit.readFromFile(commitIDLength40);
         String targetFileID = source.getStaging().getIndex().get(filename);
         // Failure case
         if (targetFileID == null) {
@@ -307,8 +308,6 @@ public class Repository {
      * first." and exit; perform this check before doing anything else.
      * For this check, it should:
      * 1. Find the untracked files.
-     * 2. See if it will be overwritten by the checkout.
-     * Do not change the CWD.
      *
      * @param branchName the branch name.
      */
@@ -337,31 +336,27 @@ public class Repository {
         // The current commit.
         Commit lastCommit = Commit.readFromFile(getLastCommitHash());
         List<String> fileLists = plainFilenamesIn(CWD);
-        List<String> untrackedFileLists = new ArrayList<>();
+
+        Set<String> untrackedFileNameSet = null;
         if (fileLists != null) {
-            untrackedFileLists = fileLists.stream().filter((f) -> lastCommit.getStaging().getIndex().containsKey(
-                    f)).collect(Collectors.toList());
-
+            untrackedFileNameSet = new HashSet<>(fileLists);
+            untrackedFileNameSet.removeAll(lastCommit.getStaging().getIndex().keySet());
+        }
+        if (untrackedFileNameSet == null || !untrackedFileNameSet.isEmpty()) {
+            System.out.println(
+                    "There is an untracked file in the way; delete it, or add and commit it first.");
+            System.exit(0);
         }
 
-        for (String untrackedFile : untrackedFileLists) {
-            if (sourceCommit.getStaging().getIndex().containsKey(untrackedFile)) {
-                System.out.println(
-                        "There is an untracked file in the way; delete it, or add and commit it first.");
-                System.exit(0);
-            }
-        }
-
-        // Overwriting the files that in the set from current commit.
-        for (String key : lastCommit.getStaging().getIndex().keySet()) {
-            if (sourceCommit.getStaging().getIndex().containsKey(key)) {
+        // Overwriting the files that in the set from current commit and blobs.
+        for (String filename : lastCommit.getStaging().getIndex().keySet()) {
+            if (sourceCommit.getStaging().getIndex().containsKey(filename)) {
                 // Replace.
-                String id = sourceCommit.getStaging().getIndex().get(key);
-                String content = readContentsAsString(join(BLOBS_DIR, id));
-                writeContents(join(CWD, key), content);
+                String blobId = sourceCommit.getStaging().getIndex().get(filename);
+                writeContents(join(CWD, filename), readBlobContent(blobId));
             } else {
                 // Remove.
-                restrictedDelete(join(CWD, key));
+                restrictedDelete(join(CWD, filename));
             }
         }
 
@@ -397,7 +392,7 @@ public class Repository {
             Commit commit = Commit.readFromFile(hash);
             System.out.println(commit.formattedCommitHistory(hash));
 
-            if(commit.isInitCommit()) break;
+            if (commit.isInitCommit()) break;
             hash = commit.getParent();
         }
     }
@@ -500,5 +495,40 @@ public class Repository {
      */
     private static String readBlobContent(String targetFileID) {
         return readContentsAsString(join(BLOBS_DIR, targetFileID));
+    }
+
+    /**
+     * Get the full commit id by full length of hash (40) or shorter hash.
+     * Requirement for shortest length is 4.
+     * Only return commit if no other object exists with a SHA-1 identifier that starts with the same six digits.
+     *
+     * @param commitID the commit id. Maybe full length or shorter.
+     * @return the full length of commit id.
+     */
+    private static String getFullCommentID(String commitID) {
+        if (commitID.length() == 40) {
+            return commitID;
+        }
+        if (commitID.length() < 4) {
+            return null;
+        }
+        List<String> commitFiles = plainFilenamesIn(COMMITS_DIR);
+        if (commitFiles == null) {
+            return null;
+        }
+
+        // Count the number of files that start with the commitID.
+        int count = 0;
+        int index = 0;
+        for (int i = 0; i < commitFiles.size(); i++) {
+            if (commitFiles.get(i).startsWith(commitID)) {
+                count++;
+                index = i;
+            }
+        }
+        if (count == 1) {
+            return commitFiles.get(index);
+        }
+        return null;
     }
 }
