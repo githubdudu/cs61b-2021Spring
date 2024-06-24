@@ -106,16 +106,39 @@ public class Commit implements Serializable {
         return secondParent == null;
     }
 
+    /**
+     * Return the information of this commit. Including the commit hash, parent commit hash, date, and
+     * commit message.
+     * <p>
+     * Example:
+     * <p>
+     * commit a0da1ea5a15ab613bf9961fd86f010cf74c7ee48
+     * <p>
+     * Date: Thu Nov 9 20:00:05 2017 -0800
+     * <p>
+     * A commit message.
+     *
+     * <p>
+     * If there is a merge commit, it will also include the parent commit hash.
+     * <p>
+     * Example:
+     * <p>
+     * commit 3e8bf1d794ca2e9ef8a4007275acf3751c7170ff
+     * <p>
+     * Merge: 4975af1 2c1ead1
+     * <p>
+     * Date: Sat Nov 11 12:30:00 2017 -0800
+     * <p>
+     * Merged development into master.
+     *
+     * @return The information of this commit
+     */
     @Override
     public String toString() {
-        String template = isMerged() ? "" : String.format(
-                "%s %s%n",
-                parent.substring(0, 6),
-                secondParent.substring(0, 6));
-        return String.format(template + "Date: %1$ta %1$tb %1$td %1$tT %1$tY %1$tz%n%2$s", date, message);
+        String parentsInfo = isMerged() ? "" : String.format("Merge: %s %s%n", parent.substring(0, 6), secondParent.substring(0, 6));
+        String dateFormatted = String.format("%1$ta %1$tb %1$td %1$tT %1$tY %1$tz", date);
+        return String.format("commit %s%n" + parentsInfo + "Date: %s%n" +"%s%n", getHash(), dateFormatted, message);
     }
 
-    public String formattedCommitHistory(String id) {
-        return String.format("===%ncommit %s%n%s%n", id, this);
-    }
+
 }

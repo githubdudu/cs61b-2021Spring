@@ -389,7 +389,8 @@ public class Repository {
         String hash = getLastCommitHash();
         while (true) {
             Commit commit = Commit.readFromFile(hash);
-            System.out.println(commit.formattedCommitHistory(hash));
+            // Prepend '===' and append empty line to the commit message.
+            System.out.printf("===%n%s%n", commit);
 
             if (commit.isInitCommit()) break;
             hash = commit.getParent();
@@ -407,7 +408,8 @@ public class Repository {
         }
         for (String commitFile : commitFiles) {
             Commit commit = Commit.readFromFile(commitFile);
-            System.out.println(commit.formattedCommitHistory(commitFile));
+            // Prepend '===' and append empty line to the commit message.
+            System.out.printf("===%n%s%n", commit);
         }
     }
 
