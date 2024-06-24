@@ -414,6 +414,31 @@ public class Repository {
     }
 
     /**
+     * gitlet find [commit message] command.
+     * <p>
+     * Prints out the ids of all commits that have the given commit message, one per line.
+     * If there are multiple such commits, it prints the ids out on separate lines.
+     * The commit message is a single operand; to indicate a multiword message,
+     * put the operand in quotation marks, as for the commit command below.
+     * <p>
+     * Failure cases: If no such commit exists, prints the error message Found no commit with that message.
+     *
+     * @param message a single operand; to indicate a multiword message, put the operand in quotation marks.
+     */
+    public static void findCommand(String message) {
+        List<String> commitFiles = plainFilenamesIn(COMMITS_DIR);
+        if (commitFiles == null) {
+            return;
+        }
+        for (String commitFile : commitFiles) {
+            Commit commit = Commit.readFromFile(commitFile);
+            if (commit.findMessage(message)) {
+                System.out.println(commit.getHash());
+            }
+        }
+    }
+
+    /**
      * TODO:
      * <li>Compare these indexes (HashMap) to decide whether:</li>
      *  <ol>

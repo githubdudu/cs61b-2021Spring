@@ -49,6 +49,7 @@ public class StagingArea implements Serializable {
         index.put(fileName, fileHash);
     }
 
+    // TODO: replace this method with a butch of methods that do map methods to hide the implementation
     public Map<String, String> getIndex() {
         return index;
     }

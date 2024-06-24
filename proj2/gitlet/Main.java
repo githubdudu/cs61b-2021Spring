@@ -50,8 +50,13 @@ public class Main {
      * Log -- Starting at the current head commit, display information about each commit backwards
      *        along the commit tree until the initial commit.
      *        Following the first parent commit links, ignoring any second parents found in merge commits.
+     *
      * <p>
      * Global-log -- Like log, except displays information about all commits ever made.
+     *
+     * <p>
+     * find -- Prints out the ids of all commits that have the given commit message, one per line.
+     *
      * <p>
      * The place to store old copies of files and other metadata: ".gitlet".
      * <p>
@@ -130,6 +135,10 @@ public class Main {
             case "global-log":
                 validateNumArgs("global-log", args, 1);
                 Repository.globalLogCommand();
+                break;
+            case "find":
+                validateNumArgs("find", args, 2);
+                Repository.findCommand(args[1]);
                 break;
             // Handle non-exist commands.
             default:

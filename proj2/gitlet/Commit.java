@@ -83,6 +83,7 @@ public class Commit implements Serializable {
     }
 
     /**
+     * TODO: replace this method with a butch of methods that do map methods to hide the implementation
      * Return the stage relates to this Commit.
      *
      * @return staging saved in Commit
@@ -140,5 +141,13 @@ public class Commit implements Serializable {
         return String.format("commit %s%n" + parentsInfo + "Date: %s%n" +"%s%n", getHash(), dateFormatted, message);
     }
 
-
+    /**
+     * Find if the commit message contains the given message.
+     *
+     * @param message The message to find
+     * @return true if the message is found in the commit message, false otherwise
+     */
+    public Boolean findMessage(String message) {
+        return this.message.contains(message);
+    }
 }
