@@ -55,6 +55,9 @@ ${COMMIT_HEAD}
 initial commit
 
 <<<*
+D UID3 "${1}"
+D UID2 "${2}"
+D UID1 "${3}"
 
 # Test 'rm' command
 
@@ -99,3 +102,26 @@ E wug2.txt
 <<<
 E wug.txt
 = wug.txt wug.txt
+
+# Test find command
+
+> find "initial"
+${UID1}
+<<<
+
+> find "wug1"
+${UID2}
+<<<
+
+> find "wug2"
+${UID3}
+<<<
+
+> find "2"
+${UID3}
+<<<
+
+> find "wug"
+${UID3}
+${UID2}
+<<<
