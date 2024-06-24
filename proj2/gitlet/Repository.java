@@ -165,7 +165,6 @@ public class Repository {
     public static void commitCommand(String message) {
         // Read the index from current commit.
         Commit lastCommit = Commit.readFromFile(getLastCommitHash());
-        StagingArea indexFromCommit = lastCommit.getStaging();
 
         // Read the index from current staging index.
         StagingArea indexStaging = StagingArea.readFromFile();
@@ -175,7 +174,7 @@ public class Repository {
         Branch branch = Branch.readFromFile(join(GITLET_DIR, ref).getName());
 
         // Failure case 1
-        if (indexFromCommit.equals(indexStaging)) {
+        if (lastCommit.hasSameIndex(indexStaging)) {
             System.out.println("No changes added to the commit.");
             System.exit(0);
         }
@@ -210,22 +209,21 @@ public class Repository {
     public static void rmCommand(String filename) {
         // Read the index from current commit.
         Commit lastCommit = Commit.readFromFile(getLastCommitHash());
-        StagingArea indexFromCommit = lastCommit.getStaging();
 
         // Read the index from current staging index.
         StagingArea indexStaging = StagingArea.readFromFile();
 
         // Failure cases
-        if (!indexFromCommit.getIndex().containsKey(filename) && !indexStaging.getIndex().containsKey(
+        if (!lastCommit.containsFile(filename) && !indexStaging.containsFile(
                 filename)) {
             System.out.println("No reason to remove the file.");
             System.exit(0);
         }
 
-        indexStaging.getIndex().remove(filename);
+        indexStaging.removeFile(filename);
         indexStaging.saveStagingToFile();
 
-        if (indexFromCommit.getIndex().containsKey(filename)) {
+        if (lastCommit.containsFile(filename)) {
             restrictedDelete(filename);
         }
 
@@ -275,7 +273,7 @@ public class Repository {
         }
 
         Commit source = Commit.readFromFile(commitIDLength40);
-        String targetFileID = source.getStaging().getIndex().get(filename);
+        String targetFileID = source.getFileHash(filename);
         // Failure case
         if (targetFileID == null) {
             System.out.println("File does not exist in that commit.");
@@ -340,7 +338,7 @@ public class Repository {
         Set<String> untrackedFileNameSet = null;
         if (fileLists != null) {
             untrackedFileNameSet = new HashSet<>(fileLists);
-            untrackedFileNameSet.removeAll(lastCommit.getStaging().getIndex().keySet());
+            untrackedFileNameSet.removeAll(lastCommit.getFileNames());
         }
         if (untrackedFileNameSet == null || !untrackedFileNameSet.isEmpty()) {
             System.out.println(
@@ -349,10 +347,10 @@ public class Repository {
         }
 
         // Overwriting the files that in the set from current commit and blobs.
-        for (String filename : lastCommit.getStaging().getIndex().keySet()) {
-            if (sourceCommit.getStaging().getIndex().containsKey(filename)) {
+        for (String filename : lastCommit.getFileNames()) {
+            if (sourceCommit.containsFile(filename)) {
                 // Replace.
-                String blobId = sourceCommit.getStaging().getIndex().get(filename);
+                String blobId = sourceCommit.getFileHash(filename);
                 writeContents(join(CWD, filename), readBlobContent(blobId));
             } else {
                 // Remove.
@@ -361,9 +359,7 @@ public class Repository {
         }
 
         // Change HEADER and index
-        StagingArea newIndex = sourceCommit.getStaging();
-        newIndex.saveStagingToFile();
-
+        setCurrentIndex(sourceCommit);
         saveTheHEADER(branchFile);
     }
 
@@ -459,7 +455,6 @@ public class Repository {
 
         // Read the index from current commit
         Commit lastCommit = Commit.readFromFile(getLastCommitHash());
-        StagingArea indexFromCommit = lastCommit.getStaging();
     }
 
     //
@@ -571,5 +566,14 @@ public class Repository {
             return commitFiles.get(index);
         }
         return null;
+    }
+
+    /**
+     * Set the current commit to the given commit.
+     *
+     * @param commit the commit to be set as current commit.
+     */
+    private static void setCurrentIndex(Commit commit) {
+        commit.saveStagingToFile();
     }
 }

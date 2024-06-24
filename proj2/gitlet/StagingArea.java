@@ -3,6 +3,7 @@ package gitlet;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represent the index. In real git, index is a tree structure that saved all the files or
@@ -49,9 +50,44 @@ public class StagingArea implements Serializable {
         index.put(fileName, fileHash);
     }
 
-    // TODO: replace this method with a butch of methods that do map methods to hide the implementation
-    public Map<String, String> getIndex() {
-        return index;
+
+    /**
+     * Check if the index contains the file that specified by filename.
+     *
+     * @param fileName the name of file.
+     * @return true if the index contains the file.
+     */
+    public boolean containsFile(String fileName) {
+        return index.containsKey(fileName);
+    }
+
+    /**
+     * Remove the file from index by filename.
+     *
+     * @param fileName the name of file.
+     * @return the hash of the file.
+     */
+    public String removeFile(String fileName) {
+        return index.remove(fileName);
+    }
+
+    /**
+     * Get the hash of the file by filename.
+     *
+     * @param fileName the name of file.
+     * @return the hash of the file.
+     */
+    public String getFileHash(String fileName) {
+        return index.get(fileName);
+    }
+
+    /**
+     * Get the file names set in the index.
+     *
+     * @return the set of file names.
+     */
+    public Set<String> getFileNames() {
+        return index.keySet();
     }
 
     /**

@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 import static gitlet.Utils.*;
 
@@ -52,6 +53,7 @@ public class Commit implements Serializable {
         this.parent = parent;
         this.secondParent = secondParent;
     }
+
     /**
      * Save commit instance to file under COMMITS_DIR directory, file name is the hash of instance.
      */
@@ -83,26 +85,76 @@ public class Commit implements Serializable {
     }
 
     /**
-     * TODO: replace this method with a butch of methods that do map methods to hide the implementation
-     * Return the stage relates to this Commit.
-     *
-     * @return staging saved in Commit
+     * Check if the commit has the same index as the given index.
+     * @param index The index to compare with
+     * @return true if the commit has the same index as the given index, false otherwise
      */
-    public StagingArea getStaging() {
-        return staging;
+    public boolean hasSameIndex(StagingArea index) {
+        return staging.equals(index);
     }
 
+    /**
+     * Check if the commit includes the given file.
+     * @param fileName The file name to check
+     * @return true if the commit includes the given file, false otherwise
+     */
+    public boolean containsFile(String fileName) {
+        return staging.containsFile(fileName);
+    }
+
+    /**
+     * Get the file hash of the given file name.
+     * @param fileName The file name to get the hash
+     * @return The hash of the given file name
+     */
+    public String getFileHash(String fileName) {
+        return staging.getFileHash(fileName);
+    }
+
+    /**
+     * Get the file names set in the staging area.
+     * @return The set of file names in the staging area
+     */
+    public Set<String> getFileNames() {
+        return staging.getFileNames();
+    }
+
+    /**
+     * Save the index of staging to file.
+     */
+    public void saveStagingToFile() {
+        staging.saveStagingToFile();
+    }
+
+    /**
+     * Get the first parent of this commit.
+     * @return The first parent of this commit
+     */
     public String getParent() {
         return parent;
     }
 
+    /**
+     * Get the second parent of this commit.
+     * @return The second parent of this commit
+     */
     public String getSecondParent() {
-        return secondParent;
+        if(isMerged()) return secondParent;
+        return null;
     }
 
+    /**
+     * Check if this commit is the initial commit.
+     * @return true if this commit is the initial commit, false otherwise
+     */
     public boolean isInitCommit() {
         return parent == null;
     }
+
+    /**
+     * Check if this commit is a merge commit(has two parents).
+     * @return true if this commit is a merge commit, false otherwise
+     */
     public boolean isMerged() {
         return secondParent == null;
     }
@@ -136,9 +188,16 @@ public class Commit implements Serializable {
      */
     @Override
     public String toString() {
-        String parentsInfo = isMerged() ? "" : String.format("Merge: %s %s%n", parent.substring(0, 6), secondParent.substring(0, 6));
+        String parentsInfo = isMerged() ? "" : String.format(
+                "Merge: %s %s%n",
+                parent.substring(0, 6),
+                secondParent.substring(0, 6));
         String dateFormatted = String.format("%1$ta %1$tb %1$td %1$tT %1$tY %1$tz", date);
-        return String.format("commit %s%n" + parentsInfo + "Date: %s%n" +"%s%n", getHash(), dateFormatted, message);
+        return String.format(
+                "commit %s%n" + parentsInfo + "Date: %s%n" + "%s%n",
+                getHash(),
+                dateFormatted,
+                message);
     }
 
     /**
