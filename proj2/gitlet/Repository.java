@@ -305,10 +305,6 @@ public class Repository {
             System.out.println("No such branch exists.");
             System.exit(0);
         }
-        // Read from target branch file.
-
-        Branch sourceBranch = Branch.readFromFile(branchName);
-        Commit sourceCommit = Commit.readFromFile(sourceBranch.getCommitHash());
 
         // Get the name of current branch.
         String currentBranchName = getCurrentBranchName();
@@ -318,36 +314,11 @@ public class Repository {
             System.exit(0);
         }
 
-        // Find the untracked file.
-        // The current commit.
-        Commit lastCommit = getLastCommit();
-        List<String> fileLists = plainFilenamesIn(CWD);
+        // Read from target branch file.
+        Branch sourceBranch = Branch.readFromFile(branchName);
+        checkoutTargetCommit(sourceBranch.getCommitHash());
 
-        Set<String> untrackedFileNameSet = null;
-        if (fileLists != null) {
-            untrackedFileNameSet = new HashSet<>(fileLists);
-            untrackedFileNameSet.removeAll(lastCommit.getFileNames());
-        }
-        if (untrackedFileNameSet == null || !untrackedFileNameSet.isEmpty()) {
-            System.out.println(
-                    "There is an untracked file in the way; delete it, or add and commit it first.");
-            System.exit(0);
-        }
-
-        // Overwriting the files that in the set from current commit and blobs.
-        for (String filename : lastCommit.getFileNames()) {
-            if (sourceCommit.containsFile(filename)) {
-                // Replace.
-                String blobId = sourceCommit.getFileHash(filename);
-                writeContents(join(CWD, filename), readBlobContent(blobId));
-            } else {
-                // Remove.
-                restrictedDelete(join(CWD, filename));
-            }
-        }
-
-        // Change HEADER and index
-        sourceCommit.saveStagingToFile();
+        // Change HEADER
         saveTheHEADER(sourceBranch);
     }
 
@@ -613,14 +584,35 @@ public class Repository {
         }
 
         // Restrict delete branch file
-        if(!branchFile.getParentFile().getName().equals("heads")) {
+        if (!branchFile.getParentFile().getName().equals("heads")) {
             throw new IllegalArgumentException("Not deleting branch file.");
         }
         branchFile.delete();
     }
 
+    /**
+     * gitlet reset [commit id] command.
+     * <p>
+     * Checks out all the files tracked by the given commit.
+     * <p>
+     * Failure cases:
+     * If no commit with the given id exists, print "No commit with that id exists."
+     *
+     * @param commitID
+     */
     public static void resetCommand(String commitID) {
+        String commitIDLength40 = getFullCommentID(commitID);
+        // Failure case
+        if (!join(COMMITS_DIR, commitIDLength40).exists()) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
 
+        // TODO: add tests for reset
+        // Change files in working directory.
+        checkoutTargetCommit(commitIDLength40);
+        // Change the branch head.
+        getCurrentBranch().setCommitHash(commitIDLength40);
     }
 
     public static void mergeCommand(String branchName) {
@@ -752,6 +744,46 @@ public class Repository {
      */
     private static String readBlobContent(String targetFileID) {
         return readContentsAsString(join(BLOBS_DIR, targetFileID));
+    }
+
+    /**
+     * Checkout the target commit.
+     *
+     * @param commitId the commit id.
+     */
+    private static void checkoutTargetCommit(String commitId) {
+        Commit sourceCommit = Commit.readFromFile(commitId);
+
+        // Find the untracked file.
+        // The current commit.
+        Commit lastCommit = getLastCommit();
+        List<String> fileLists = plainFilenamesIn(CWD);
+
+        Set<String> untrackedFileNameSet = null;
+        if (fileLists != null) {
+            untrackedFileNameSet = new HashSet<>(fileLists);
+            untrackedFileNameSet.removeAll(lastCommit.getFileNames());
+        }
+        if (untrackedFileNameSet != null && !untrackedFileNameSet.isEmpty()) {
+            System.out.println(
+                    "There is an untracked file in the way; delete it, or add and commit it first.");
+            System.exit(0);
+        }
+
+        // Overwriting the files that in the set from current commit and blobs.
+        for (String filename : lastCommit.getFileNames()) {
+            if (sourceCommit.containsFile(filename)) {
+                // Replace.
+                String blobId = sourceCommit.getFileHash(filename);
+                writeContents(join(CWD, filename), readBlobContent(blobId));
+            } else {
+                // Remove.
+                restrictedDelete(join(CWD, filename));
+            }
+        }
+
+        // Save the index staging file.
+        sourceCommit.saveStagingToFile();
     }
 
     /**

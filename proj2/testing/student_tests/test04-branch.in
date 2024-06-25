@@ -56,7 +56,7 @@ zzzzBranch
 
 # remove branch
 > rm-branch nonexistingBranch
-branch with that name does not exist.
+A branch with that name does not exist.
 <<<
 > rm-branch master
 Cannot remove the current branch.
