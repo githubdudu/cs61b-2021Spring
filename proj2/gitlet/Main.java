@@ -55,7 +55,24 @@ public class Main {
      * Global-log -- Like log, except displays information about all commits ever made.
      *
      * <p>
-     * find -- Prints out the ids of all commits that have the given commit message, one per line.
+     * find [commit message] -- Prints out the ids of all commits that have the given commit message, one per line.
+     *
+     * <p>
+     *     status -- Displays what branches currently exist, and marks the current branch with a *.
+     *     Also displays what files have been staged for addition or removal.
+     *
+     * <p>
+     *     branch [branch name] -- Creates a new branch with the given name, and points it at the current
+     *     head node.
+     *
+     * <p>
+     *     rm-branch [branch name] -- Deletes the branch with the given name.
+     *
+     * <p>
+     *     reset [commit id] -- Checks out all the files tracked by the given commit.
+     *
+     * <p>
+     *     merge [branch name] -- Merges files from the given branch into the current branch.
      *
      * <p>
      * The place to store old copies of files and other metadata: ".gitlet".
@@ -140,6 +157,27 @@ public class Main {
                 validateNumArgs("find", args, 2);
                 Repository.findCommand(args[1]);
                 break;
+            case "status":
+                validateNumArgs("status", args, 1);
+                Repository.statusCommand();
+                break;
+            case "branch":
+                validateNumArgs("branch", args, 2);
+                Repository.branchCommand(args[1]);
+                break;
+            case "rm-branch":
+                validateNumArgs("rm-branch", args, 2);
+                Repository.rmBranchCommand(args[1]);
+                break;
+            case "reset":
+                validateNumArgs("reset", args, 2);
+                Repository.resetCommand(args[1]);
+                break;
+            case "merge":
+                validateNumArgs("merge", args, 2);
+                Repository.mergeCommand(args[1]);
+                break;
+
             // Handle non-exist commands.
             default:
                 System.out.println("No command with that name exists.");

@@ -51,7 +51,7 @@ public class Branch {
      *
      * @param hash the content bo be saved.
      */
-    public void setContent(String hash) {
+    public void setCommitHash(String hash) {
         this.commitHash = hash;
     }
 
@@ -74,7 +74,7 @@ public class Branch {
      */
     public static Branch readFromFile(String branchName) {
         Branch b = new Branch(branchName);
-        b.setContent(readContentsAsString(b.getBranchFile()));
+        b.setCommitHash(readContentsAsString(b.getBranchFile()));
         return b;
     }
 

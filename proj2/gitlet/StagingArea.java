@@ -46,7 +46,7 @@ public class StagingArea implements Serializable {
      * @param fileName the name of file.
      * @param fileHash the hash of file.
      */
-    public void updateIndex(String fileName, String fileHash) {
+    public void put(String fileName, String fileHash) {
         index.put(fileName, fileHash);
     }
 
@@ -88,6 +88,15 @@ public class StagingArea implements Serializable {
      */
     public Set<String> getFileNames() {
         return index.keySet();
+    }
+
+    /**
+     * Returns a Set view of the fileName and fileHash mappings contained in this index.
+     *
+     * @return A set view of the mappings contained in this index.
+     */
+    public Set<Map.Entry<String, String>> FileEntrySet() {
+        return index.entrySet();
     }
 
     /**

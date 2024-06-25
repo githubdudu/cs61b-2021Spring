@@ -1,10 +1,7 @@
 package gitlet;
 
 import java.io.File;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static gitlet.Utils.*;
 
@@ -73,13 +70,13 @@ public class Repository {
         String initMessage = "initial commit";
 
         // Create and save initial commit.
-        Commit commit = new Commit(initStage, initDate, initMessage, getLastCommitHash());
+        Commit commit = new Commit(initStage, initDate, initMessage, null);
         commit.saveCommitToFile();
 
         // Create a master branch and save it.
         // Save the hash of commit as the content of branch head.
         Branch defaultBranch = new Branch();
-        defaultBranch.setContent(commit.getHash());
+        defaultBranch.setCommitHash(commit.getHash());
         defaultBranch.saveBranchToFile();
 
         // Create a HEAD pointer, HEADER.
@@ -117,18 +114,11 @@ public class Repository {
         }
 
         // Save file and calculate the sha1 of the file
-        String fileHash = sha1(readContentsAsString(file));
-        if (!BLOBS_DIR.exists()) {
-            BLOBS_DIR.mkdir();
-        }
-        File blobFile = join(BLOBS_DIR, fileHash);
-        if (!blobFile.exists()) {
-            writeContents(blobFile, readContentsAsString(file));
-        }
+        String fileHash = saveBlobContent(file);
 
         // Read the index from current staging index, update, and then save.
-        StagingArea indexStaging = StagingArea.readFromFile();
-        indexStaging.updateIndex(filename, fileHash);
+        StagingArea indexStaging = getCurrentStaging();
+        indexStaging.put(filename, fileHash);
         indexStaging.saveStagingToFile();
 
     }
@@ -164,14 +154,10 @@ public class Repository {
      */
     public static void commitCommand(String message) {
         // Read the index from current commit.
-        Commit lastCommit = Commit.readFromFile(getLastCommitHash());
+        Commit lastCommit = getLastCommit();
 
         // Read the index from current staging index.
-        StagingArea indexStaging = StagingArea.readFromFile();
-
-        // Read the branch from branch file.
-        String ref = readHEADERFromFile();
-        Branch branch = Branch.readFromFile(join(GITLET_DIR, ref).getName());
+        StagingArea indexStaging = getCurrentStaging();
 
         // Failure case 1
         if (lastCommit.hasSameIndex(indexStaging)) {
@@ -188,8 +174,10 @@ public class Repository {
         Commit newCommit = new Commit(indexStaging, new Date(), message, getLastCommitHash());
         newCommit.saveCommitToFile();
 
+        // Read the branch from branch file.
+        Branch branch = getCurrentBranch();
         // Move the pointer of branch
-        branch.setContent(newCommit.getHash());
+        branch.setCommitHash(newCommit.getHash());
         branch.saveBranchToFile();
 
     }
@@ -208,10 +196,10 @@ public class Repository {
      */
     public static void rmCommand(String filename) {
         // Read the index from current commit.
-        Commit lastCommit = Commit.readFromFile(getLastCommitHash());
+        Commit lastCommit = getLastCommit();
 
         // Read the index from current staging index.
-        StagingArea indexStaging = StagingArea.readFromFile();
+        StagingArea indexStaging = getCurrentStaging();
 
         // Failure cases
         if (!lastCommit.containsFile(filename) && !indexStaging.containsFile(
@@ -323,7 +311,7 @@ public class Repository {
         Commit sourceCommit = Commit.readFromFile(sourceBranch.getCommitHash());
 
         // Get the name of current branch.
-        String currentBranchName = join(GITLET_DIR, readHEADERFromFile()).getName();
+        String currentBranchName = getCurrentBranchName();
         // Failure case. Check if two branches are same branch.
         if (branchName.equals(currentBranchName)) {
             System.out.println("No need to checkout the current branch.");
@@ -332,7 +320,7 @@ public class Repository {
 
         // Find the untracked file.
         // The current commit.
-        Commit lastCommit = Commit.readFromFile(getLastCommitHash());
+        Commit lastCommit = getLastCommit();
         List<String> fileLists = plainFilenamesIn(CWD);
 
         Set<String> untrackedFileNameSet = null;
@@ -359,7 +347,7 @@ public class Repository {
         }
 
         // Change HEADER and index
-        setCurrentIndex(sourceCommit);
+        sourceCommit.saveStagingToFile();
         saveTheHEADER(branchFile);
     }
 
@@ -435,8 +423,44 @@ public class Repository {
     }
 
     /**
-     * TODO:
-     * <li>Compare these indexes (HashMap) to decide whether:</li>
+     * gitlet status command.
+     * <p>
+     * For example:
+     * <p>
+     * === Branches ===
+     * <p>
+     * *master
+     * <p>
+     * other-branch
+     * <p>
+     * <br>
+     * === Staged Files ===
+     * <p>
+     * wug.txt
+     * <p>
+     * wug2.txt
+     * <p>
+     * <br>
+     * === Removed Files ===
+     * <p>
+     * goodbye.txt
+     * <p>
+     * <br>
+     * === Modifications Not Staged For Commit ===
+     * <p>
+     * junk.txt (deleted)
+     * <p>
+     * wug3.txt (modified)
+     * <p>
+     * <br>
+     * === Untracked Files ===
+     * <p>
+     * random.stuff
+     * <p>
+     *
+     * <p>First, we say the entry in the index is equal when both fileName and fileHash are same.</p>
+     * <p>For the indexing of last commit: C1 and current indexing: C2, those staged files are diff(C2, C1),
+     * removed files are diff(C1, C2) </p>
      *  <ol>
      *      <li>add this file.(If staging version is different from the version in current
      *      commit.)</li>
@@ -452,10 +476,110 @@ public class Repository {
      */
     public static void statusCommand() {
 
-
         // Read the index from current commit
-        Commit lastCommit = Commit.readFromFile(getLastCommitHash());
+        Commit lastCommit = getLastCommit();
+        StagingArea currentStaging = getCurrentStaging();
+        Set<Map.Entry<String, String>> lastIndexingFileSet = lastCommit.FileEntrySet();
+        Set<Map.Entry<String, String>> currentStagingFileSet = getCurrentStaging().FileEntrySet();
+        TreeSet<String> stagedFiles = new TreeSet<>();
+        TreeSet<String> removedFiles = new TreeSet<>();
+
+        // Staged files
+        for (Map.Entry<String, String> entry : currentStagingFileSet) {
+            if (!lastIndexingFileSet.contains(entry)) {
+                stagedFiles.add(entry.getKey());
+            }
+        }
+        // Removed files
+        for (Map.Entry<String, String> entry : lastIndexingFileSet) {
+            if (!currentStagingFileSet.contains(entry)) {
+                removedFiles.add(entry.getKey());
+            }
+        }
+
+        // All files in working directory
+        List<String> fileLists = plainFilenamesIn(CWD);
+        // Prepare modified files
+        Set<String> modifiedFiles = new TreeSet<>();
+        Set<String> untrackedFiles = new TreeSet<>();
+
+        // Prepare modified files - Deleted files
+        for (Map.Entry<String, String> entry : currentStagingFileSet) {
+            if (fileLists == null || !fileLists.contains(entry.getKey())) {
+                modifiedFiles.add(entry.getKey() + " (deleted)");
+            }
+        }
+
+        // Prepare the untracked files
+        if (fileLists != null) { // Might be null if the directory is empty
+            for (String fileName : fileLists) {
+                // If the file is not in the staging area, it is untracked.
+                // files present in the working directory but neither staged for addition nor tracked.
+                // This includes files that have been staged for removal, but then re-created without Gitlet’s knowledge
+                if (!currentStaging.containsFile(fileName)) {
+                    untrackedFiles.add(fileName);
+                } else {
+                    Map.Entry<String, String> fileEntry = new AbstractMap.SimpleEntry<>(
+                            fileName,
+                            sha1(readContentsAsString(join(CWD, fileName))));
+                    if (!currentStagingFileSet.contains(fileEntry)) {
+                        modifiedFiles.add(fileName + " (modified)");
+                    }
+                }
+            }
+        }
+
+
+        // Display the branches
+        System.out.println("=== Branches ===");
+        printBranchStatus();
+        System.out.println();
+
+        // Display the staged files
+        System.out.println("=== Staged Files ===");
+        for (String fileName : stagedFiles) {
+            System.out.println(fileName);
+        }
+        System.out.println();
+
+        // Display the removed files
+        System.out.println("=== Removed Files ===");
+        for (String fileName : removedFiles) {
+            System.out.println(fileName);
+        }
+        System.out.println();
+
+        // Display the modifications not staged for commit
+        System.out.println("=== Modifications Not Staged For Commit ===");
+        for (String fileName : modifiedFiles) {
+            System.out.println(fileName);
+        }
+        System.out.println();
+
+        // Display the untracked files
+        System.out.println("=== Untracked Files ===");
+        for (String fileName : untrackedFiles) {
+            System.out.println(fileName);
+        }
+        System.out.println();
     }
+
+    public static void branchCommand(String branchName) {
+
+    }
+
+    public static void rmBranchCommand(String branchName) {
+
+    }
+
+    public static void resetCommand(String commitID) {
+
+    }
+
+    public static void mergeCommand(String branchName) {
+
+    }
+
 
     //
     // Below is helper method
@@ -508,6 +632,15 @@ public class Repository {
     }
 
     /**
+     * Get the current staging area by reading file "index" from disk.
+     *
+     * @return the current staging area.
+     */
+    private static StagingArea getCurrentStaging() {
+        return StagingArea.readFromFile();
+    }
+
+    /**
      * Get the hash of last commit from branch file.
      *
      * @return the hash string.
@@ -521,6 +654,50 @@ public class Repository {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * Get the last commit object.
+     *
+     * @return the last commit object.
+     */
+    private static Commit getLastCommit() {
+        return Commit.readFromFile(getLastCommitHash());
+    }
+
+    /**
+     * Get the current branch name.
+     *
+     * @return the current branch name.
+     */
+    private static String getCurrentBranchName() {
+        return join(GITLET_DIR, readHEADERFromFile()).getName();
+    }
+
+    /**
+     * Get the current branch object.
+     *
+     * @return the current branch object.
+     */
+    private static Branch getCurrentBranch() {
+        return Branch.readFromFile(getCurrentBranchName());
+    }
+
+    /**
+     * Save the content of file as blob with the hash of the file content as the file name.
+     *
+     * @param file the file to be saved as blob.
+     */
+    private static String saveBlobContent(File file) {
+        String fileHash = sha1(readContentsAsString(file));
+        if (!BLOBS_DIR.exists()) {
+            BLOBS_DIR.mkdir();
+        }
+        File blobFile = join(BLOBS_DIR, fileHash);
+        if (!blobFile.exists()) {
+            writeContents(blobFile, readContentsAsString(file));
+        }
+        return fileHash;
     }
 
     /**
@@ -569,11 +746,25 @@ public class Repository {
     }
 
     /**
-     * Set the current commit to the given commit.
-     *
-     * @param commit the commit to be set as current commit.
+     * Print the branch status.
+     * Entries should be listed in lexicographic order.
      */
-    private static void setCurrentIndex(Commit commit) {
-        commit.saveStagingToFile();
+    private static void printBranchStatus() {
+        List<String> branchFiles = plainFilenamesIn(BRANCH_DIR);
+        if (branchFiles == null) {
+            return;
+        }
+
+        Collections.sort(branchFiles);
+        // Print the current branch with a '*' in front of it.
+        String currentBranch = getCurrentBranchName();
+        // Print the rest of the branches.
+        for (String branchFile : branchFiles) {
+            if (branchFile.equals(currentBranch)) {
+                System.out.printf("*%s%n", currentBranch);
+            } else {
+                System.out.println(branchFile);
+            }
+        }
     }
 }

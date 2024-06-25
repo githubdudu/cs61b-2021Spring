@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 import static gitlet.Utils.*;
@@ -86,6 +87,7 @@ public class Commit implements Serializable {
 
     /**
      * Check if the commit has the same index as the given index.
+     *
      * @param index The index to compare with
      * @return true if the commit has the same index as the given index, false otherwise
      */
@@ -95,6 +97,7 @@ public class Commit implements Serializable {
 
     /**
      * Check if the commit includes the given file.
+     *
      * @param fileName The file name to check
      * @return true if the commit includes the given file, false otherwise
      */
@@ -104,6 +107,7 @@ public class Commit implements Serializable {
 
     /**
      * Get the file hash of the given file name.
+     *
      * @param fileName The file name to get the hash
      * @return The hash of the given file name
      */
@@ -113,10 +117,20 @@ public class Commit implements Serializable {
 
     /**
      * Get the file names set in the staging area.
+     *
      * @return The set of file names in the staging area
      */
     public Set<String> getFileNames() {
         return staging.getFileNames();
+    }
+
+    /**
+     * Returns a Set view of the fileName and fileHash mappings contained in this staging area.
+     *
+     * @return A set view of the mappings contained in this staging area.
+     */
+    public Set<Map.Entry<String, String>> FileEntrySet() {
+        return staging.FileEntrySet();
     }
 
     /**
@@ -128,6 +142,7 @@ public class Commit implements Serializable {
 
     /**
      * Get the first parent of this commit.
+     *
      * @return The first parent of this commit
      */
     public String getParent() {
@@ -136,15 +151,17 @@ public class Commit implements Serializable {
 
     /**
      * Get the second parent of this commit.
+     *
      * @return The second parent of this commit
      */
     public String getSecondParent() {
-        if(isMerged()) return secondParent;
+        if (isMerged()) return secondParent;
         return null;
     }
 
     /**
      * Check if this commit is the initial commit.
+     *
      * @return true if this commit is the initial commit, false otherwise
      */
     public boolean isInitCommit() {
@@ -153,6 +170,7 @@ public class Commit implements Serializable {
 
     /**
      * Check if this commit is a merge commit(has two parents).
+     *
      * @return true if this commit is a merge commit, false otherwise
      */
     public boolean isMerged() {
