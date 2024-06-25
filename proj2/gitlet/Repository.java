@@ -361,8 +361,8 @@ public class Repository {
      * <li>The timestamps displayed in the commits reflect the current timezone, not UTC.
      * Your timezone might be different depending on where you live, and that’s fine.</li>
      * <li>For merge commits (those that have two parent commits), add a line just below the first.
-     * where the two hexadecimal numerals following “Merge:” consist of
-     * the first seven digits of the first and second parents’ commit ids, in that order.
+     * where the two hexadecimal numerals following "Merge:" consist of
+     * the first seven digits of the first and second parents' commit ids, in that order.
      * The first parent is the branch you were on when you did the merge; the second is that of the merged-in branch. </li>
      *
      * <p>Error cases: No</p>
