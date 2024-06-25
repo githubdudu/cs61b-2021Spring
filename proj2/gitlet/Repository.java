@@ -348,7 +348,7 @@ public class Repository {
 
         // Change HEADER and index
         sourceCommit.saveStagingToFile();
-        saveTheHEADER(branchFile);
+        saveTheHEADER(sourceBranch);
     }
 
     /**
@@ -619,25 +619,21 @@ public class Repository {
 
     /**
      * Save the branch relative path to HEADER file.
+     * Windows users especially should beware that the file separator character
+     * is / on Unix (or MacOS) and '\' on Windows.
+     * So if you form file names in your program by concatenating some directory names
+     * and a file name together with explicit /s or \s, you can be sure that it won’t work
+     * on one system or the other.
+     * Java provides a system-dependent file separator character
+     * (System.getProperty("file.separator")), or you can use the multi-argument constructors to File.
      *
      * @param branch the branch that the header is pointing to.
      */
     private static void saveTheHEADER(Branch branch) {
-        String relativePath = Repository.GITLET_DIR.toPath().relativize(branch.getBranchFile().toPath()).toString();
+        String relativePath = "heads" + "/" + branch.getName();
         writeContents(HEAD_POINTER, relativePath);
     }
 
-
-    /**
-     * Save the file relative path into HEADER file.
-     *
-     * @param file the file to which the header is pointing. The file is either a branch file
-     *             that stores a commit hash, or just a commit object/file.
-     */
-    private static void saveTheHEADER(File file) {
-        String relativePath = Repository.GITLET_DIR.toPath().relativize(file.toPath()).toString();
-        writeContents(HEAD_POINTER, relativePath);
-    }
 
     /**
      * Return the content of HEADER, the ref of the branch file.
@@ -645,7 +641,8 @@ public class Repository {
      * @return the content of HEADER, the ref of the branch file.
      */
     private static String readHEADERFromFile() {
-        return readContentsAsString(Repository.HEAD_POINTER);
+        String rawPath = readContentsAsString(Repository.HEAD_POINTER);
+        return rawPath.replace("/", File.separator);
     }
 
     /**
