@@ -1,0 +1,79 @@
+I definitions.inc
+> init
+<<<
+
+# Test the branch after first init
+> status
+=== Branches ===
+*master
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+
+=== Untracked Files ===
+
+<<<
+
+# Add a aaaaBranch
+> branch aaaaBranch
+<<<
+> status
+=== Branches ===
+aaaaBranch
+*master
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+
+=== Untracked Files ===
+
+<<<
+
+# Add a zzzzBranch
+> branch zzzzBranch
+<<<
+> status
+=== Branches ===
+aaaaBranch
+*master
+zzzzBranch
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+
+=== Untracked Files ===
+
+<<<
+
+# remove branch
+> rm-branch nonexistingBranch
+branch with that name does not exist.
+<<<
+> rm-branch master
+Cannot remove the current branch.
+<<<
+> rm-branch aaaaBranch
+<<<
+> status
+=== Branches ===
+*master
+zzzzBranch
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+
+=== Untracked Files ===
+
+<<<

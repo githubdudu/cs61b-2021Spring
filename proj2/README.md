@@ -6,7 +6,11 @@ make check TESTER_FLAGS="--verbose --tolerance=0"
 The default tolerance is 3.
 
 ## For run one single test file
+```bash
 python3 testing/tester.py testing/samples/test01-init.in
+python3 testing/tester.py testing/student_tests/test04-branch.in
+
+```
 
 ## For debugging: must run in **/testing folder
 python3 runner.py --debug samples/test03-basic-log.in

@@ -585,8 +585,38 @@ public class Repository {
         newBranch.saveBranchToFile();
     }
 
+    /**
+     * gitlet rm-branch [branch name] command.
+     * <p>
+     * Deletes the branch with the given name.
+     * <p>
+     * Failure cases:
+     * If a branch with the given name does not exist, print the error message
+     * A branch with that name does not exist.
+     * If you try to remove the branch you’re currently on, print the error message
+     * Cannot remove the current branch.
+     *
+     * @param branchName
+     */
     public static void rmBranchCommand(String branchName) {
+        File branchFile = join(BRANCH_DIR, branchName);
+        // Failure case
+        if (!branchFile.exists()) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
 
+        // Failure case
+        if (branchName.equals(getCurrentBranchName())) {
+            System.out.println("Cannot remove the current branch.");
+            System.exit(0);
+        }
+
+        // Restrict delete branch file
+        if(!branchFile.getParentFile().getName().equals("heads")) {
+            throw new IllegalArgumentException("Not deleting branch file.");
+        }
+        branchFile.delete();
     }
 
     public static void resetCommand(String commitID) {
