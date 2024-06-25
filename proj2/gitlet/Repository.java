@@ -255,7 +255,7 @@ public class Repository {
     public static void checkoutCommand(String commitID, String filename) {
         String commitIDLength40 = getFullCommentID(commitID);
         // Failure case
-        if (!join(COMMITS_DIR, commitIDLength40).exists()) {
+        if (commitIDLength40 == null || !join(COMMITS_DIR, commitIDLength40).exists()) {
             System.out.println("No commit with that id exists.");
             System.exit(0);
         }
@@ -603,7 +603,7 @@ public class Repository {
     public static void resetCommand(String commitID) {
         String commitIDLength40 = getFullCommentID(commitID);
         // Failure case
-        if (!join(COMMITS_DIR, commitIDLength40).exists()) {
+        if (commitIDLength40 == null || !join(COMMITS_DIR, commitIDLength40).exists()) {
             System.out.println("No commit with that id exists.");
             System.exit(0);
         }
@@ -611,8 +611,10 @@ public class Repository {
         // TODO: add tests for reset
         // Change files in working directory.
         checkoutTargetCommit(commitIDLength40);
-        // Change the branch head.
-        getCurrentBranch().setCommitHash(commitIDLength40);
+        // Change the currentBranch head.
+        Branch currentBranch = getCurrentBranch();
+        currentBranch.setCommitHash(commitIDLength40);
+        currentBranch.saveBranchToFile();
     }
 
     public static void mergeCommand(String branchName) {
