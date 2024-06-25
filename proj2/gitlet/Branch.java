@@ -38,6 +38,18 @@ public class Branch {
     }
 
     /**
+     * Create a new branch with the same commit hash as the given branch.
+     *
+     * @param branch  the current branch.
+     * @param newName the new branch name.
+     */
+    public Branch(Branch branch, String newName) {
+        this.name = newName;
+        this.branchFile = Utils.join(Repository.BRANCH_DIR, newName);
+        this.commitHash = branch.commitHash;
+    }
+
+    /**
      * get the relative path from two absolute paths: GITLET_DIR and branch file path.
      *
      * @return relative path of the branch head file, relative to .gitlet folder.

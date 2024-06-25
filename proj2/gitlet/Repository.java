@@ -564,8 +564,25 @@ public class Repository {
         System.out.println();
     }
 
+    /**
+     * gitlet branch [branch name] command.
+     * <p>
+     * Creates a new branch with the given name, and points it at the current head commit.
+     * <p>
+     * Failure cases: If a branch with the given name already exists,
+     * print the error message A branch with that name already exists.
+     *
+     * @param branchName the new branch name.
+     */
     public static void branchCommand(String branchName) {
+        // Failure case
+        if (join(BRANCH_DIR, branchName).exists()) {
+            System.out.println("A branch with that name already exists.");
+            System.exit(0);
+        }
 
+        Branch newBranch = new Branch(getCurrentBranch(), branchName);
+        newBranch.saveBranchToFile();
     }
 
     public static void rmBranchCommand(String branchName) {
