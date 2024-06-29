@@ -451,7 +451,7 @@ public class Repository {
         Commit lastCommit = getLastCommit();
         StagingArea currentStaging = getCurrentStaging();
         Set<Map.Entry<String, String>> lastIndexingFileSet = lastCommit.FileEntrySet();
-        Set<Map.Entry<String, String>> currentStagingFileSet = getCurrentStaging().FileEntrySet();
+        Set<Map.Entry<String, String>> currentStagingFileSet = currentStaging.FileEntrySet();
         TreeSet<String> stagedFiles = new TreeSet<>();
         TreeSet<String> removedFiles = new TreeSet<>();
 
@@ -462,9 +462,9 @@ public class Repository {
             }
         }
         // Removed files
-        for (Map.Entry<String, String> entry : lastIndexingFileSet) {
-            if (!currentStagingFileSet.contains(entry)) {
-                removedFiles.add(entry.getKey());
+        for (String filename : lastCommit.getFileNames()) {
+            if (!currentStaging.containsFile(filename)) {
+                removedFiles.add(filename);
             }
         }
 
@@ -598,7 +598,7 @@ public class Repository {
      * Failure cases:
      * If no commit with the given id exists, print "No commit with that id exists."
      *
-     * @param commitID
+     * @param commitID the commit id that the files will be checked out.
      */
     public static void resetCommand(String commitID) {
         String commitIDLength40 = getFullCommentID(commitID);
@@ -608,7 +608,6 @@ public class Repository {
             System.exit(0);
         }
 
-        // TODO: add tests for reset
         // Change files in working directory.
         checkoutTargetCommit(commitIDLength40);
         // Change the currentBranch head.

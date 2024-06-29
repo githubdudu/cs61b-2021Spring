@@ -37,9 +37,28 @@ wug.txt
 
 <<<
 
-# Test the status of a modified file and an untracked file
+# Test the staged modified files
 > commit "added wug.txt"
 <<<
++ wug.txt modified-wug.txt
+> add wug.txt
+<<<
+> status
+=== Branches ===
+*master
+
+=== Staged Files ===
+wug.txt
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+
+=== Untracked Files ===
+
+<<<
+
+# Test the status of a modified file and an untracked file
 + wug2.txt wug.txt
 > add wug2.txt
 <<<
@@ -51,6 +70,7 @@ wug.txt
 *master
 
 === Staged Files ===
+wug1.txt
 wug2.txt
 
 === Removed Files ===
