@@ -47,7 +47,8 @@ public class Commit implements Serializable {
         this(staging, date, message, parent, null);
     }
 
-    public Commit(StagingArea staging, Date date, String message, String parent, String secondParent) {
+    public Commit(StagingArea staging, Date date, String message, String parent,
+                  String secondParent) {
         this.staging = staging;
         this.date = date;
         this.message = message;
@@ -129,8 +130,8 @@ public class Commit implements Serializable {
      *
      * @return A set view of the mappings contained in this staging area.
      */
-    public Set<Map.Entry<String, String>> FileEntrySet() {
-        return staging.FileEntrySet();
+    public Set<Map.Entry<String, String>> fileEntrySet() {
+        return staging.fileEntrySet();
     }
 
     /**
@@ -155,7 +156,9 @@ public class Commit implements Serializable {
      * @return The second parent of this commit
      */
     public String getSecondParent() {
-        if (isMerged()) return secondParent;
+        if (isMerged()) {
+            return secondParent;
+        }
         return null;
     }
 
@@ -178,8 +181,8 @@ public class Commit implements Serializable {
     }
 
     /**
-     * Return the information of this commit. Including the commit hash, parent commit hash, date, and
-     * commit message.
+     * Return the information of this commit. Including the commit hash, parent commit hash, date,
+     * and commit message.
      * <p>
      * Example:
      * <p>
@@ -206,25 +209,21 @@ public class Commit implements Serializable {
      */
     @Override
     public String toString() {
-        String parentsInfo = isMerged() ? "" : String.format(
-                "Merge: %s %s%n",
-                parent.substring(0, 6),
-                secondParent.substring(0, 6));
+        String parentsInfo = isMerged() ? "" :
+                String.format("Merge: %s %s%n", parent.substring(0, 6),
+                        secondParent.substring(0, 6));
         String dateFormatted = String.format("%1$ta %1$tb %1$td %1$tT %1$tY %1$tz", date);
-        return String.format(
-                "commit %s%n" + parentsInfo + "Date: %s%n" + "%s%n",
-                getHash(),
-                dateFormatted,
-                message);
+        return String.format("commit %s%n" + parentsInfo + "Date: %s%n" + "%s%n", getHash(),
+                dateFormatted, message);
     }
 
     /**
      * Find if the commit message contains the given message.
      *
-     * @param message The message to find
+     * @param stringToFind The message to find
      * @return true if the message is found in the commit message, false otherwise
      */
-    public Boolean findMessage(String message) {
-        return this.message.contains(message);
+    public Boolean findMessage(String stringToFind) {
+        return this.message.contains(stringToFind);
     }
 }

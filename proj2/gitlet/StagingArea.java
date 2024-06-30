@@ -95,7 +95,7 @@ public class StagingArea implements Serializable {
      *
      * @return A set view of the mappings contained in this index.
      */
-    public Set<Map.Entry<String, String>> FileEntrySet() {
+    public Set<Map.Entry<String, String>> fileEntrySet() {
         return index.entrySet();
     }
 

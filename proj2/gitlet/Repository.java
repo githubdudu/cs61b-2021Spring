@@ -98,7 +98,8 @@ public class Repository {
      * We calculate the staging area that displayed in status command by compare the indexing file
      * and the index from current commit.
      * <p>
-     * In real git, multiple files may be added at once. In gitlet, only one file may be added at a time.
+     * In real git, multiple files may be added at once. In gitlet, only one file may be added at
+     * a time.
      * <p>
      * Failure cases: File does not exist.
      *
@@ -181,7 +182,8 @@ public class Repository {
             System.exit(0);
         }
 
-        Commit newCommit = new Commit(indexStaging, new Date(), message, getLastCommitHash(), secondParent);
+        Commit newCommit = new Commit(indexStaging, new Date(), message, getLastCommitHash(),
+                secondParent);
         newCommit.saveCommitToFile();
 
         // Read the branch from branch file.
@@ -344,7 +346,8 @@ public class Repository {
      * <li>For merge commits (those that have two parent commits), add a line just below the first.
      * where the two hexadecimal numerals following "Merge:" consist of
      * the first seven digits of the first and second parents' commit ids, in that order.
-     * The first parent is the branch you were on when you did the merge; the second is that of the merged-in branch. </li>
+     * The first parent is the branch you were on when you did the merge; the second is that of the
+     * merged-in branch. </li>
      *
      * <p>Error cases: No</p>
      * <p>Utilize Commit.toString() method</p>
@@ -357,14 +360,17 @@ public class Repository {
             // Prepend '===' and append empty line to the commit message.
             System.out.printf("===%n%s%n", commit);
 
-            if (commit.isInitCommit()) break;
+            if (commit.isInitCommit()) {
+                break;
+            }
             hash = commit.getParent();
         }
     }
 
     /**
      * gitlet global-log command.
-     * Like log, except displays information about all commits ever made. The order of the commits does not matter.
+     * Like log, except displays information about all commits ever made. The order of the commits
+     * does not matter.
      */
     public static void globalLogCommand() {
         List<String> commitFiles = plainFilenamesIn(COMMITS_DIR);
@@ -386,9 +392,11 @@ public class Repository {
      * The commit message is a single operand; to indicate a multiword message,
      * put the operand in quotation marks, as for the commit command below.
      * <p>
-     * Failure cases: If no such commit exists, prints the error message Found no commit with that message.
+     * Failure cases: If no such commit exists, prints the error message Found no commit with that
+     * message.
      *
-     * @param message a single operand; to indicate a multiword message, put the operand in quotation marks.
+     * @param message a single operand; to indicate a multiword message, put the operand in
+     *                quotation marks.
      */
     public static void findCommand(String message) {
         List<String> commitFiles = plainFilenamesIn(COMMITS_DIR);
@@ -439,9 +447,9 @@ public class Repository {
      * random.stuff
      * <p>
      *
-     * <p>First, we say the entry in the index is equal when both fileName and fileHash are same.</p>
-     * <p>For the indexing of last commit: C1 and current indexing: C2, those staged files are diff(C2, C1),
-     * removed files are diff(C1, C2) </p>
+     * <p>First, we say the entry in the index is equal when both fileName and fileHash are same.
+     * <p>For the indexing of last commit: C1 and current indexing: C2, those staged files are
+     * diff(C2, C1), removed files are diff(C1, C2) </p>
      *  <ol>
      *      <li>add this file.(If staging version is different from the version in current
      *      commit.)</li>
@@ -454,17 +462,21 @@ public class Repository {
      * For example:
      * Current Staging:      1,2,3, ,5*
      * Staging from commit:  1,2, ,4,5*
+     *                 // If the file is not in the staging area, it is untracked.
+     *                 // files present in the working directory but neither staged for addition nor
+     *                 // tracked.
+     *                 // This includes files that have been staged for removal, but then re-created
+     *                 // without Gitlet’s knowledge
      */
     public static void statusCommand() {
 
         // Read the index from current commit
         Commit lastCommit = getLastCommit();
         StagingArea currentStaging = getCurrentStaging();
-        Set<Map.Entry<String, String>> lastIndexingFileSet = lastCommit.FileEntrySet();
-        Set<Map.Entry<String, String>> currentStagingFileSet = currentStaging.FileEntrySet();
+        Set<Map.Entry<String, String>> lastIndexingFileSet = lastCommit.fileEntrySet();
+        Set<Map.Entry<String, String>> currentStagingFileSet = currentStaging.fileEntrySet();
         TreeSet<String> stagedFiles = new TreeSet<>();
         TreeSet<String> removedFiles = new TreeSet<>();
-
         // Staged files
         for (Map.Entry<String, String> entry : currentStagingFileSet) {
             if (!lastIndexingFileSet.contains(entry)) {
@@ -477,7 +489,6 @@ public class Repository {
                 removedFiles.add(filename);
             }
         }
-
         // All files in working directory
         List<String> fileLists = plainFilenamesIn(CWD);
         // Prepare modified files
@@ -494,9 +505,7 @@ public class Repository {
         // Prepare the untracked files
         if (fileLists != null) { // Might be null if the directory is empty
             for (String fileName : fileLists) {
-                // If the file is not in the staging area, it is untracked.
-                // files present in the working directory but neither staged for addition nor tracked.
-                // This includes files that have been staged for removal, but then re-created without Gitlet’s knowledge
+
                 if (!currentStaging.containsFile(fileName)) {
                     untrackedFiles.add(fileName);
                 } else {
@@ -509,34 +518,28 @@ public class Repository {
                 }
             }
         }
-
-
         // Display the branches
         System.out.println("=== Branches ===");
         printBranchStatus();
         System.out.println();
-
         // Display the staged files
         System.out.println("=== Staged Files ===");
         for (String fileName : stagedFiles) {
             System.out.println(fileName);
         }
         System.out.println();
-
         // Display the removed files
         System.out.println("=== Removed Files ===");
         for (String fileName : removedFiles) {
             System.out.println(fileName);
         }
         System.out.println();
-
         // Display the modifications not staged for commit
         System.out.println("=== Modifications Not Staged For Commit ===");
         for (String fileName : modifiedFiles) {
             System.out.println(fileName);
         }
         System.out.println();
-
         // Display the untracked files
         System.out.println("=== Untracked Files ===");
         for (String fileName : untrackedFiles) {
@@ -640,11 +643,90 @@ public class Repository {
      * "Current branch fast-forwarded."
      * <p>
      * Otherwise, we continue with the steps below.
+     * <p>
+     * If the file is same in both branches.
+     * <p>
+     *      A A0 A* A   B* B  B0  C* C  C0   D  D*  D  D
+     *      A A1 A  A*  B* B  B0  C  C* C1   D1 D1  D* D1
+     *      A A1 A  A*  B  B* B1  C* C  C0   D2 D2  D2 D*
+     * Merge:A A1 A  A*  B  B* B1  C  C* C1   conflict
      *
      * @param branchNameMergeFrom the branch name that will be merged from.
      */
     public static void mergeCommand(String branchNameMergeFrom) {
+        mergeFailCases(branchNameMergeFrom);
+        String currentBranchHash = getLastCommitHash();
+        String targetBranchHash = Branch.readFromFile(branchNameMergeFrom).getCommitHash();
 
+        // Merge is complete or fast-forwarded.
+        String lca = lowestCommonAncestor(currentBranchHash, targetBranchHash);
+        if (lca.equals(targetBranchHash)) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            System.exit(0);
+        }
+        if (lca.equals(currentBranchHash)) {
+            checkoutBranchCommand(branchNameMergeFrom);
+            System.out.println("Current branch fast-forwarded.");
+            System.exit(0);
+        }
+
+        // Otherwise, continue merge.
+        // it is like diff3 in git.
+        Commit currentCommit = getLastCommit();
+        Commit givenCommit = Commit.readFromFile(targetBranchHash);
+        Commit lcaCommit = Commit.readFromFile(lca);
+        StagingArea newIndex = getCurrentStaging();
+
+        for (String fileName : givenCommit.getFileNames()) {
+            // Case 1
+            if (modified(fileName, lcaCommit, givenCommit) && notModified(fileName, lcaCommit,
+                    currentCommit)) {
+                writeContents(
+                        join(CWD, fileName),
+                        readBlobContent(givenCommit.getFileHash(fileName)));
+                newIndex.put(fileName, givenCommit.getFileHash(fileName));
+            }
+            // Case 5
+            if (!lcaCommit.containsFile(fileName) && !currentCommit.containsFile(fileName)) {
+                writeContents(
+                        join(CWD, fileName),
+                        readBlobContent(givenCommit.getFileHash(fileName)));
+                newIndex.put(fileName, givenCommit.getFileHash(fileName));
+            }
+        }
+        // case 6
+        for (String fileName : currentCommit.getFileNames()) {
+            if (notModified(fileName, lcaCommit, currentCommit) && !givenCommit.containsFile(
+                    fileName)) {
+                restrictedDelete(fileName);
+                newIndex.removeFile(fileName);
+            }
+        }
+        // case 8
+        boolean isConflict = false;
+        for (String fileName : lcaCommit.getFileNames()) {
+            if (isConflict(fileName, lcaCommit, currentCommit, givenCommit)) {
+                String contentOfCurrentFile = currentCommit.containsFile(fileName) ?
+                        readBlobContent(currentCommit.getFileHash(fileName)) : "";
+                String contentOfGivenFile = givenCommit.containsFile(fileName) ?
+                        readBlobContent(givenCommit.getFileHash(fileName)) : "";
+                String contentOfMerged = String.format("<<<<<<< HEAD\n%s=======\n%s>>>>>>>",
+                        contentOfCurrentFile, contentOfGivenFile);
+
+                writeContents(join(CWD, fileName), contentOfMerged);
+                String fileHash = saveBlobContent(join(CWD, fileName));
+                newIndex.put(fileName, fileHash);
+                isConflict = true;
+            }
+        }
+        newIndex.saveStagingToFile();
+        commitCommand(
+                String.format("Merged %s into %s.", branchNameMergeFrom, getCurrentBranchName()),
+                targetBranchHash);
+        if (isConflict) System.out.println("Encountered a merge conflict.");
+    }
+
+    private static void mergeFailCases(String branchNameMergeFrom) {
         // If there are staged additions or removals present.
         if (!getLastCommit().hasSameIndex(getCurrentStaging())) {
             System.out.println("You have uncommitted changes.");
@@ -663,94 +745,20 @@ public class Repository {
         // If there is an untracked file
         if (hasUntrackedFile()) {
             System.out.println(
-                    "There is an untracked file in the way; delete it, or add and commit it first.");
+                    "There is an untracked file in the way; " +
+                            "delete it, or add and commit it first.");
             System.exit(0);
         }
-
-        String currentBranchHash = getLastCommitHash();
-        String targetBranchHash = Branch.readFromFile(branchNameMergeFrom).getCommitHash();
-
-        // Merge is complete or fast-forwarded.
-        String LCA = lowestCommonAncestor(currentBranchHash, targetBranchHash);
-        if (LCA.equals(targetBranchHash)) {
-            System.out.println("Given branch is an ancestor of the current branch.");
-            System.exit(0);
-        }
-        if (LCA.equals(currentBranchHash)) {
-            checkoutBranchCommand(branchNameMergeFrom);
-            System.out.println("Current branch fast-forwarded.");
-            System.exit(0);
-        }
-
-        // Otherwise, continue merge.
-        // it is like diff3 in git.
-        Commit currentCommit = getLastCommit();
-        Commit givenCommit = Commit.readFromFile(targetBranchHash);
-        Commit LCACommit = Commit.readFromFile(LCA);
-        StagingArea newIndex = getCurrentStaging();
-
-        for (String fileName : givenCommit.getFileNames()) {
-            // Case 1
-            if (modified(fileName, LCACommit, givenCommit) && notModified(
-                    fileName,
-                    LCACommit,
-                    currentCommit)) {
-
-                writeContents(
-                        join(CWD, fileName),
-                        readBlobContent(givenCommit.getFileHash(fileName)));
-                newIndex.put(fileName, givenCommit.getFileHash(fileName));
-            }
-            // Case 5
-            if (!LCACommit.containsFile(fileName) && !currentCommit.containsFile(fileName)) {
-                writeContents(
-                        join(CWD, fileName),
-                        readBlobContent(givenCommit.getFileHash(fileName)));
-                newIndex.put(fileName, givenCommit.getFileHash(fileName));
-            }
-        }
-        // case 6
-        for (String fileName : currentCommit.getFileNames()) {
-            if (notModified(fileName, LCACommit, currentCommit) && !givenCommit.containsFile(
-                    fileName)) {
-                restrictedDelete(fileName);
-                newIndex.removeFile(fileName);
-            }
-        }
-        // case 8
-        boolean isConflict = false;
-        for (String fileName : LCACommit.getFileNames()) {
-            if (isConflict(fileName, LCACommit, currentCommit, givenCommit)) {
-                String contentOfCurrentFile = currentCommit.containsFile(fileName) ? readBlobContent(currentCommit.getFileHash(fileName)) : "";
-                String contentOfGivenFile = givenCommit.containsFile(fileName) ? readBlobContent(givenCommit.getFileHash(fileName)) : "";
-                String contentOfMerged = String.format("<<<<<<< HEAD\n%s=======\n%s>>>>>>>", contentOfCurrentFile, contentOfGivenFile);
-
-                writeContents(join(CWD, fileName), contentOfMerged);
-                String fileHash = saveBlobContent(join(CWD, fileName));
-                newIndex.put(fileName, fileHash);
-                isConflict = true;
-            }
-        }
-
-        // If the file is same in both branches.
-
-        //      A A0 A* A   B* B  B0  C* C  C0   D  D*  D  D
-        //      A A1 A  A*  B* B  B0  C  C* C1   D1 D1  D* D1
-        //      A A1 A  A*  B  B* B1  C* C  C0   D2 D2  D2 D*
-        //Merge:A A1 A  A*  B  B* B1  C  C* C1   conflict
-        newIndex.saveStagingToFile();
-        commitCommand(String.format("Merged %s into %s.", branchNameMergeFrom, getCurrentBranchName()), targetBranchHash);
-        if (isConflict) System.out.println("Encountered a merge conflict.");
     }
 
     private static boolean modified(String file, Commit commitA, Commit commitB) {
-        return commitA.containsFile(file) && commitB.containsFile(file) && !commitA.getFileHash(file).equals(
-                commitB.getFileHash(file));
+        return commitA.containsFile(file) && commitB.containsFile(file)
+                && !commitA.getFileHash(file).equals(commitB.getFileHash(file));
     }
 
     private static boolean notModified(String file, Commit commitA, Commit commitB) {
-        return commitA.containsFile(file) && commitB.containsFile(file) && commitA.getFileHash(file).equals(
-                commitB.getFileHash(file));
+        return commitA.containsFile(file) && commitB.containsFile(file)
+                && commitA.getFileHash(file).equals(commitB.getFileHash(file));
     }
 
     private static boolean isConflict(String file, Commit commitA, Commit commitB, Commit commitC) {
@@ -769,7 +777,8 @@ public class Repository {
      */
     private static void initGitletFolder() {
         if (GITLET_DIR.exists()) {
-            System.out.println("A Gitlet version-control system already exists in the current" + " directory.");
+            System.out.println("A Gitlet version-control system already exists in the current"
+                    + " directory.");
             System.exit(0);
         }
 
@@ -787,7 +796,8 @@ public class Repository {
      * and a file name together with explicit /s or \s, you can be sure that it won’t work
      * on one system or the other.
      * Java provides a system-dependent file separator character
-     * (System.getProperty("file.separator")), or you can use the multi-argument constructors to File.
+     * (System.getProperty("file.separator")), or you can use the multi-argument constructors to
+     * File.
      *
      * @param branch the branch that the header is pointing to.
      */
@@ -827,7 +837,7 @@ public class Repository {
             String hash = readContentsAsString(join(Repository.GITLET_DIR, ref));
 
             return hash;
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return null;
         }
     }
@@ -901,7 +911,8 @@ public class Repository {
 
         if (hasUntrackedFile()) {
             System.out.println(
-                    "There is an untracked file in the way; delete it, or add and commit it first.");
+                    "There is an untracked file in the way; " +
+                            "delete it, or add and commit it first.");
             System.exit(0);
         }
 
@@ -940,7 +951,8 @@ public class Repository {
     /**
      * Get the full commit id by full length of hash (40) or shorter hash.
      * Requirement for shortest length is 4.
-     * Only return commit if no other object exists with a SHA-1 identifier that starts with the same six digits.
+     * Only return commit if no other object exists with a SHA-1 identifier that starts with the
+     * same six digits.
      *
      * @param commitID the commit id. Maybe full length or shorter.
      * @return the full length of commit id.
@@ -998,14 +1010,16 @@ public class Repository {
     /**
      * LCA of a DAG.
      * Given a DAG and two vertices v and w, find the lowest common ancestor (LCA) of v and w.
-     * The LCA of v and w is an ancestor of v and w that has no descendants that are also ancestors of v and w.
+     * The LCA of v and w is an ancestor of v and w that has no descendants that are also ancestors
+     * of v and w.
      *
      * @param commitA the hash of the current branch.
      * @param commitB the hash of the target branch.
      */
     private static String lowestCommonAncestor(String commitA, String commitB) {
 
-        // 1. Define the depth of a vertex v in a DAG to be the length of the longest path from a root to v.
+        // 1. Define the depth of a vertex v in a DAG to be the length of the longest path from
+        // a root to v.
         Map<String, Integer> depth = depthMap(commitA, commitB);
 
         Set<String> commitAAncestors = ancestors(commitA);
@@ -1018,7 +1032,8 @@ public class Repository {
      * Depth is max distance from root. The depth of root is 0.
      * We visit nodes in a depth-first fashion. We’ll encounter a lot of unseen vertices and
      * append them the visitStack, until at some point we’ll hit a root and set its depth to 0.
-     * At this point we start backtracking, pop()-ing nodes from visit as soon as we compute their depth.
+     * At this point we start backtracking, pop()-ing nodes from visit as soon as we compute their
+     * depth.
      *
      * @param commitA the commit node A
      * @param commitB the commit node B
