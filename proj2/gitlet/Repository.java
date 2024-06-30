@@ -392,8 +392,8 @@ public class Repository {
      * The commit message is a single operand; to indicate a multiword message,
      * put the operand in quotation marks, as for the commit command below.
      * <p>
-     * Failure cases: If no such commit exists, prints the error message Found no commit with that
-     * message.
+     * Failure cases: If no such commit exists, prints the error message "Found no commit with that
+     * message."
      *
      * @param message a single operand; to indicate a multiword message, put the operand in
      *                quotation marks.
@@ -403,11 +403,16 @@ public class Repository {
         if (commitFiles == null) {
             return;
         }
+        boolean found = false;
         for (String commitFile : commitFiles) {
             Commit commit = Commit.readFromFile(commitFile);
             if (commit.findMessage(message)) {
+                found = true;
                 System.out.println(commit.getHash());
             }
+        }
+        if (!found) {
+            System.out.println("Found no commit with that message.");
         }
     }
 
