@@ -125,6 +125,16 @@ public class Repository {
 
     /**
      * gitlet commit [message] command.
+     * A commit command that is not a merge commit.
+     *
+     * @param message the commit message.
+     */
+    public static void commitCommand(String message) {
+        commitCommand(message, null);
+    }
+
+    /**
+     * gitlet commit [message] command.
      * <ol>
      *     <li>Just save the latest index as new commit. </li>
      *     <ol>
@@ -152,7 +162,7 @@ public class Repository {
      *
      * @param message commit message. Must be non-blank.
      */
-    public static void commitCommand(String message) {
+    public static void commitCommand(String message, String secondParent) {
         // Read the index from current commit.
         Commit lastCommit = getLastCommit();
 
@@ -171,7 +181,7 @@ public class Repository {
             System.exit(0);
         }
 
-        Commit newCommit = new Commit(indexStaging, new Date(), message, getLastCommitHash());
+        Commit newCommit = new Commit(indexStaging, new Date(), message, getLastCommitHash(), secondParent);
         newCommit.saveCommitToFile();
 
         // Read the branch from branch file.
@@ -616,8 +626,137 @@ public class Repository {
         currentBranch.saveBranchToFile();
     }
 
-    public static void mergeCommand(String branchName) {
+    /**
+     * gitlet merge [branch name] command.
+     * <p>
+     * Merges files from the given branch into the current branch.
+     * <p>
+     * If the split point is the same commit as the given branch, then we do nothing;
+     * the merge is complete, and the operation ends with the message
+     * "Given branch is an ancestor of the current branch."
+     * <p>
+     * If the split point is the current branch, then the effect is to check out the
+     * given branch, and the operation ends after printing the message
+     * "Current branch fast-forwarded."
+     * <p>
+     * Otherwise, we continue with the steps below.
+     *
+     * @param branchNameMergeFrom the branch name that will be merged from.
+     */
+    public static void mergeCommand(String branchNameMergeFrom) {
 
+        // If there are staged additions or removals present.
+        if (!getLastCommit().hasSameIndex(getCurrentStaging())) {
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
+        // If the given branch does not exist.
+        if (!join(BRANCH_DIR, branchNameMergeFrom).exists()) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+        // If attempting to merge a branch with itself
+        if (branchNameMergeFrom.equals(getCurrentBranchName())) {
+            System.out.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
+        // If there is an untracked file
+        if (hasUntrackedFile()) {
+            System.out.println(
+                    "There is an untracked file in the way; delete it, or add and commit it first.");
+            System.exit(0);
+        }
+
+        String currentBranchHash = getLastCommitHash();
+        String targetBranchHash = Branch.readFromFile(branchNameMergeFrom).getCommitHash();
+
+        // Merge is complete or fast-forwarded.
+        String LCA = lowestCommonAncestor(currentBranchHash, targetBranchHash);
+        if (LCA.equals(targetBranchHash)) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            System.exit(0);
+        }
+        if (LCA.equals(currentBranchHash)) {
+            checkoutBranchCommand(branchNameMergeFrom);
+            System.out.println("Current branch fast-forwarded.");
+            System.exit(0);
+        }
+
+        // Otherwise, continue merge.
+        // it is like diff3 in git.
+        Commit currentCommit = getLastCommit();
+        Commit givenCommit = Commit.readFromFile(targetBranchHash);
+        Commit LCACommit = Commit.readFromFile(LCA);
+        StagingArea newIndex = getCurrentStaging();
+
+        for (String fileName : givenCommit.getFileNames()) {
+            // Case 1
+            if (modified(fileName, LCACommit, givenCommit) && notModified(
+                    fileName,
+                    LCACommit,
+                    currentCommit)) {
+
+                writeContents(
+                        join(CWD, fileName),
+                        readBlobContent(givenCommit.getFileHash(fileName)));
+                newIndex.put(fileName, givenCommit.getFileHash(fileName));
+            }
+            // Case 5
+            if (!LCACommit.containsFile(fileName) && !currentCommit.containsFile(fileName)) {
+                writeContents(
+                        join(CWD, fileName),
+                        readBlobContent(givenCommit.getFileHash(fileName)));
+                newIndex.put(fileName, givenCommit.getFileHash(fileName));
+            }
+        }
+        // case 6
+        for (String fileName : currentCommit.getFileNames()) {
+            if (notModified(fileName, LCACommit, currentCommit) && !givenCommit.containsFile(
+                    fileName)) {
+                restrictedDelete(fileName);
+                newIndex.removeFile(fileName);
+            }
+        }
+        // case 8
+        boolean isConflict = false;
+        for (String fileName : LCACommit.getFileNames()) {
+            if (isConflict(fileName, LCACommit, currentCommit, givenCommit)) {
+                String contentOfCurrentFile = currentCommit.containsFile(fileName) ? readBlobContent(currentCommit.getFileHash(fileName)) : "";
+                String contentOfGivenFile = givenCommit.containsFile(fileName) ? readBlobContent(givenCommit.getFileHash(fileName)) : "";
+                String contentOfMerged = String.format("<<<<<<< HEAD\n%s=======\n%s>>>>>>>", contentOfCurrentFile, contentOfGivenFile);
+
+                writeContents(join(CWD, fileName), contentOfMerged);
+                String fileHash = saveBlobContent(join(CWD, fileName));
+                newIndex.put(fileName, fileHash);
+                isConflict = true;
+            }
+        }
+
+        // If the file is same in both branches.
+
+        //      A A0 A* A   B* B  B0  C* C  C0   D  D*  D  D
+        //      A A1 A  A*  B* B  B0  C  C* C1   D1 D1  D* D1
+        //      A A1 A  A*  B  B* B1  C* C  C0   D2 D2  D2 D*
+        //Merge:A A1 A  A*  B  B* B1  C  C* C1   conflict
+        newIndex.saveStagingToFile();
+        commitCommand(String.format("Merged %s into %s.", branchNameMergeFrom, getCurrentBranchName()), targetBranchHash);
+        if (isConflict) System.out.println("Encountered a merge conflict.");
+    }
+
+    private static boolean modified(String file, Commit commitA, Commit commitB) {
+        return commitA.containsFile(file) && commitB.containsFile(file) && !commitA.getFileHash(file).equals(
+                commitB.getFileHash(file));
+    }
+
+    private static boolean notModified(String file, Commit commitA, Commit commitB) {
+        return commitA.containsFile(file) && commitB.containsFile(file) && commitA.getFileHash(file).equals(
+                commitB.getFileHash(file));
+    }
+
+    private static boolean isConflict(String file, Commit commitA, Commit commitB, Commit commitC) {
+        return (modified(file, commitB, commitC))
+                || (!commitC.containsFile(file) && modified(file, commitA, commitB))
+                || (!commitB.containsFile(file) && modified(file, commitA, commitC));
     }
 
 
@@ -724,6 +863,7 @@ public class Repository {
      * Save the content of file as blob with the hash of the file content as the file name.
      *
      * @param file the file to be saved as blob.
+     * @return the hash of the file content.
      */
     private static String saveBlobContent(File file) {
         String fileHash = sha1(readContentsAsString(file));
@@ -758,14 +898,8 @@ public class Repository {
         // Find the untracked file.
         // The current commit.
         Commit lastCommit = getLastCommit();
-        List<String> fileLists = plainFilenamesIn(CWD);
 
-        Set<String> untrackedFileNameSet = null;
-        if (fileLists != null) {
-            untrackedFileNameSet = new HashSet<>(fileLists);
-            untrackedFileNameSet.removeAll(lastCommit.getFileNames());
-        }
-        if (untrackedFileNameSet != null && !untrackedFileNameSet.isEmpty()) {
+        if (hasUntrackedFile()) {
             System.out.println(
                     "There is an untracked file in the way; delete it, or add and commit it first.");
             System.exit(0);
@@ -785,6 +919,22 @@ public class Repository {
 
         // Save the index staging file.
         sourceCommit.saveStagingToFile();
+    }
+
+    /**
+     * Check if there is any untracked file in the working directory.
+     *
+     * @return true if there is any untracked file in the working directory.
+     */
+    private static boolean hasUntrackedFile() {
+        List<String> fileLists = plainFilenamesIn(CWD);
+
+        Set<String> untrackedFileNameSet = null;
+        if (fileLists != null) {
+            untrackedFileNameSet = new HashSet<>(fileLists);
+            untrackedFileNameSet.removeAll(getLastCommit().getFileNames());
+        }
+        return untrackedFileNameSet != null && !untrackedFileNameSet.isEmpty();
     }
 
     /**
@@ -843,5 +993,92 @@ public class Repository {
                 System.out.println(branchFile);
             }
         }
+    }
+
+    /**
+     * LCA of a DAG.
+     * Given a DAG and two vertices v and w, find the lowest common ancestor (LCA) of v and w.
+     * The LCA of v and w is an ancestor of v and w that has no descendants that are also ancestors of v and w.
+     *
+     * @param commitA the hash of the current branch.
+     * @param commitB the hash of the target branch.
+     */
+    private static String lowestCommonAncestor(String commitA, String commitB) {
+
+        // 1. Define the depth of a vertex v in a DAG to be the length of the longest path from a root to v.
+        Map<String, Integer> depth = depthMap(commitA, commitB);
+
+        Set<String> commitAAncestors = ancestors(commitA);
+        Set<String> commitBAncestors = ancestors(commitB);
+        commitAAncestors.retainAll(commitBAncestors);
+        return commitAAncestors.stream().max(Comparator.comparingInt(depth::get)).get();
+    }
+
+    /**
+     * Depth is max distance from root. The depth of root is 0.
+     * We visit nodes in a depth-first fashion. We’ll encounter a lot of unseen vertices and
+     * append them the visitStack, until at some point we’ll hit a root and set its depth to 0.
+     * At this point we start backtracking, pop()-ing nodes from visit as soon as we compute their depth.
+     *
+     * @param commitA the commit node A
+     * @param commitB the commit node B
+     * @return a map of the depth of each ancestor commit of A and B.
+     */
+    private static Map<String, Integer> depthMap(String commitA, String commitB) {
+        Map<String, Integer> depth = new HashMap<>();
+        Deque<String> visitStack = new LinkedList<>(); // use as stack: push(), peek(), pop()
+        visitStack.push(commitA);
+        visitStack.push(commitB);
+        while (!visitStack.isEmpty()) {
+            String currentHash = visitStack.peek();
+            Commit currentCommit = Commit.readFromFile(currentHash);
+            if (currentCommit.isInitCommit()) {
+                depth.put(currentHash, 0);
+                visitStack.pop();
+            } else {
+                String parent = currentCommit.getParent();
+                if (parent != null && !depth.containsKey(parent)) {
+                    visitStack.push(parent);
+                }
+                String secondParent = currentCommit.getSecondParent();
+                if (secondParent != null && !depth.containsKey(secondParent)) {
+                    visitStack.push(secondParent);
+                }
+                if (depth.containsKey(parent) && depth.containsKey(secondParent)) {
+                    int currentDepth = Math.max(depth.get(parent), depth.get(secondParent)) + 1;
+                    depth.put(currentHash, currentDepth);
+                    visitStack.pop();
+                }
+            }
+        }
+        return depth;
+    }
+
+    /**
+     * Get the ancestors of a commit.
+     *
+     * @param commitHash the commit hash.
+     * @return the ancestors of a commit.
+     */
+    private static Set<String> ancestors(String commitHash) {
+        Set<String> ancestors = new HashSet<>();
+        Deque<String> visitStack = new LinkedList<>();
+        visitStack.push(commitHash);
+        while (!visitStack.isEmpty()) {
+            String currentHash = visitStack.pop();
+            if (!ancestors.contains(currentHash)) {
+                ancestors.add(currentHash);
+                Commit currentCommit = Commit.readFromFile(currentHash);
+                String parent = currentCommit.getParent();
+                if (parent != null) {
+                    visitStack.push(parent);
+                }
+                String secondParent = currentCommit.getSecondParent();
+                if (secondParent != null) {
+                    visitStack.push(secondParent);
+                }
+            }
+        }
+        return ancestors;
     }
 }
