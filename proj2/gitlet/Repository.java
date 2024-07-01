@@ -681,6 +681,13 @@ public class Repository {
         Commit givenCommit = Commit.readFromFile(targetBranchHash);
         Commit lcaCommit = Commit.readFromFile(lca);
         StagingArea newIndex = getCurrentStaging();
+        // If there is an untracked file
+        if (hasUntrackedFile(givenCommit)) {
+            System.out.println(
+                    "There is an untracked file in the way; " +
+                            "delete it, or add and commit it first.");
+            System.exit(0);
+        }
 
         for (String fileName : givenCommit.getFileNames()) {
             // Case 1
@@ -747,13 +754,7 @@ public class Repository {
             System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
         }
-        // If there is an untracked file
-        if (hasUntrackedFile()) {
-            System.out.println(
-                    "There is an untracked file in the way; " +
-                            "delete it, or add and commit it first.");
-            System.exit(0);
-        }
+
     }
 
     private static boolean modified(String file, Commit commitA, Commit commitB) {
@@ -914,7 +915,7 @@ public class Repository {
         // The current commit.
         Commit lastCommit = getLastCommit();
 
-        if (hasUntrackedFile()) {
+        if (hasUntrackedFile(sourceCommit)) {
             System.out.println(
                     "There is an untracked file in the way; " +
                             "delete it, or add and commit it first.");
@@ -924,7 +925,9 @@ public class Repository {
         // Overwriting the files that in the set from current commit and blobs.
         for (String filename : lastCommit.getFileNames()) {
             // Remove.
-            restrictedDelete(join(CWD, filename));
+            if (!sourceCommit.containsFile(filename)) {
+                restrictedDelete(join(CWD, filename));
+            }
         }
         for (String fileName : sourceCommit.getFileNames()) {
             if (!lastCommit.containsFile(fileName)) {
@@ -948,15 +951,19 @@ public class Repository {
      *
      * @return true if there is any untracked file in the working directory.
      */
-    private static boolean hasUntrackedFile() {
+    private static boolean hasUntrackedFile(Commit targetCommit) {
         List<String> fileLists = plainFilenamesIn(CWD);
 
-        Set<String> untrackedFileNameSet = null;
         if (fileLists != null) {
-            untrackedFileNameSet = new HashSet<>(fileLists);
-            untrackedFileNameSet.removeAll(getLastCommit().getFileNames());
+            for (String file : fileLists) {
+                if (!getCurrentStaging().containsFile(file) && !getLastCommit().containsFile(
+                        file) && targetCommit.containsFile(file)) {
+                    return true;
+                }
+            }
+            return false;
         }
-        return untrackedFileNameSet != null && !untrackedFileNameSet.isEmpty();
+        return false;
     }
 
     /**

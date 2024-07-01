@@ -42,14 +42,8 @@ Incorrect operands.
 No commit with that id exists.
 <<<
 
-# Should fail because untracked file
-+ wug3.txt wug.txt
-> reset ${UID2}
-There is an untracked file in the way; delete it, or add and commit it first.
-<<<
-
 # Should succeed
-- wug3.txt
++ wug3.txt wug.txt
 > reset ${UID2}
 <<<
 > log
@@ -62,6 +56,6 @@ ${COMMIT_HEAD}
 initial commit
 
 <<<*
-* wug3.txt
+E wug3.txt
 * wug2.txt
 E wug1.txt
