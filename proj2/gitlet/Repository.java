@@ -1077,8 +1077,9 @@ public class Repository {
                 if (secondParent != null && !depth.containsKey(secondParent)) {
                     visitStack.push(secondParent);
                 }
-                if (depth.containsKey(parent) && depth.containsKey(secondParent)) {
-                    int currentDepth = Math.max(depth.get(parent), depth.get(secondParent)) + 1;
+                if (currentHash.equals(visitStack.peek())) {
+                    int secondParentDepth = secondParent == null ? 0 : depth.get(secondParent);
+                    int currentDepth = Math.max(depth.get(parent), secondParentDepth) + 1;
                     depth.put(currentHash, currentDepth);
                     visitStack.pop();
                 }
