@@ -684,8 +684,8 @@ public class Repository {
         // If there is an untracked file
         if (hasUntrackedFile(givenCommit)) {
             System.out.println(
-                    "There is an untracked file in the way; " +
-                            "delete it, or add and commit it first.");
+                    "There is an untracked file in the way; "
+                            + "delete it, or add and commit it first.");
             System.exit(0);
         }
 
@@ -718,10 +718,10 @@ public class Repository {
         boolean isConflict = false;
         for (String fileName : lcaCommit.getFileNames()) {
             if (isConflict(fileName, lcaCommit, currentCommit, givenCommit)) {
-                String contentOfCurrentFile = currentCommit.containsFile(fileName) ?
-                        readBlobContent(currentCommit.getFileHash(fileName)) : "";
-                String contentOfGivenFile = givenCommit.containsFile(fileName) ?
-                        readBlobContent(givenCommit.getFileHash(fileName)) : "";
+                String contentOfCurrentFile = currentCommit.containsFile(fileName)
+                        ? readBlobContent(currentCommit.getFileHash(fileName)) : "";
+                String contentOfGivenFile = givenCommit.containsFile(fileName)
+                        ? readBlobContent(givenCommit.getFileHash(fileName)) : "";
                 String contentOfMerged = String.format("<<<<<<< HEAD\n%s=======\n%s>>>>>>>",
                         contentOfCurrentFile, contentOfGivenFile);
 
@@ -735,7 +735,9 @@ public class Repository {
         commitCommand(
                 String.format("Merged %s into %s.", branchNameMergeFrom, getCurrentBranchName()),
                 targetBranchHash);
-        if (isConflict) System.out.println("Encountered a merge conflict.");
+        if (isConflict) {
+            System.out.println("Encountered a merge conflict.");
+        }
     }
 
     private static void mergeFailCases(String branchNameMergeFrom) {
@@ -917,8 +919,8 @@ public class Repository {
 
         if (hasUntrackedFile(sourceCommit)) {
             System.out.println(
-                    "There is an untracked file in the way; " +
-                            "delete it, or add and commit it first.");
+                    "There is an untracked file in the way; "
+                            + "delete it, or add and commit it first.");
             System.exit(0);
         }
 
