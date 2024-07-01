@@ -768,7 +768,8 @@ public class Repository {
     }
 
     private static boolean isConflict(String file, Commit commitA, Commit commitB, Commit commitC) {
-        return (modified(file, commitB, commitC))
+        return !notModified(file, commitA, commitB) && !notModified(file, commitA,
+                commitC) && (modified(file, commitB, commitC))
                 || (!commitC.containsFile(file) && modified(file, commitA, commitB))
                 || (!commitB.containsFile(file) && modified(file, commitA, commitC));
     }
