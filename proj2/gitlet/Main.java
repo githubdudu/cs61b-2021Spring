@@ -130,7 +130,11 @@ public class Main {
                 Repository.rmCommand(args[1]);
                 break;
             case "checkout":
-                if (args[1].equals("--")) {
+                if (args.length == 2) {
+                    // handle the `checkout [branch name]` command
+                    Repository.checkoutBranchCommand(args[1]);
+                    return;
+                } else if (args[1].equals("--")) {
                     // handle the `checkout -- [file name]` command
                     validateNumArgs("checkout", args, 3);
                     Repository.checkoutCommand(args[2]);
@@ -139,10 +143,8 @@ public class Main {
                     validateNumArgs("checkout", args, 4);
                     Repository.checkoutCommand(args[1], args[3]);
                 } else {
-                    // handle the `checkout [branch name]` command
-                    // Also handle all incorrect operands
-                    validateNumArgs("checkout", args, 2);
-                    Repository.checkoutBranchCommand(args[1]);
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
                 }
                 break;
             case "log":

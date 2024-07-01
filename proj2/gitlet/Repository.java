@@ -923,13 +923,19 @@ public class Repository {
 
         // Overwriting the files that in the set from current commit and blobs.
         for (String filename : lastCommit.getFileNames()) {
-            if (sourceCommit.containsFile(filename)) {
-                // Replace.
-                String blobId = sourceCommit.getFileHash(filename);
-                writeContents(join(CWD, filename), readBlobContent(blobId));
-            } else {
-                // Remove.
-                restrictedDelete(join(CWD, filename));
+            // Remove.
+            restrictedDelete(join(CWD, filename));
+        }
+        for (String fileName : sourceCommit.getFileNames()) {
+            if (!lastCommit.containsFile(fileName)) {
+                // Add
+                writeContents(join(CWD, fileName),
+                        readBlobContent(sourceCommit.getFileHash(fileName)));
+            } else if (!sourceCommit.getFileHash(fileName).equals(
+                    lastCommit.getFileHash(fileName))) {
+                // Replace
+                writeContents(join(CWD, fileName),
+                        readBlobContent(sourceCommit.getFileHash(fileName)));
             }
         }
 
