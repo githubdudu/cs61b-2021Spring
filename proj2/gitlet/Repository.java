@@ -674,7 +674,6 @@ public class Repository {
             System.out.println("Current branch fast-forwarded.");
             System.exit(0);
         }
-
         // Otherwise, continue merge.
         // it is like diff3 in git.
         Commit currentCommit = getLastCommit();
@@ -688,7 +687,6 @@ public class Repository {
                             + "delete it, or add and commit it first.");
             System.exit(0);
         }
-
         for (String fileName : givenCommit.getFileNames()) {
             // Case 1
             if (modified(fileName, lcaCommit, givenCommit) && notModified(fileName, lcaCommit,
@@ -722,7 +720,7 @@ public class Repository {
                         ? readBlobContent(currentCommit.getFileHash(fileName)) : "";
                 String contentOfGivenFile = givenCommit.containsFile(fileName)
                         ? readBlobContent(givenCommit.getFileHash(fileName)) : "";
-                String contentOfMerged = String.format("<<<<<<< HEAD\n%s=======\n%s>>>>>>>",
+                String contentOfMerged = String.format("<<<<<<< HEAD\n%s=======\n%s>>>>>>>\n",
                         contentOfCurrentFile, contentOfGivenFile);
 
                 writeContents(join(CWD, fileName), contentOfMerged);
