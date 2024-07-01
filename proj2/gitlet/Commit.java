@@ -177,7 +177,7 @@ public class Commit implements Serializable {
      * @return true if this commit is a merge commit, false otherwise
      */
     public boolean isMerged() {
-        return secondParent == null;
+        return secondParent != null;
     }
 
     /**
@@ -209,9 +209,8 @@ public class Commit implements Serializable {
      */
     @Override
     public String toString() {
-        String parentsInfo = isMerged() ? ""
-                : String.format("Merge: %s %s%n", parent.substring(0, 6),
-                secondParent.substring(0, 6));
+        String parentsInfo =
+                isMerged() ? String.format("Merge: %.7s %.7s%n", parent, secondParent) : "";
         String dateFormatted = String.format("%1$ta %1$tb %1$td %1$tT %1$tY %1$tz", date);
         return String.format("commit %s%n" + parentsInfo + "Date: %s%n" + "%s%n", getHash(),
                 dateFormatted, message);

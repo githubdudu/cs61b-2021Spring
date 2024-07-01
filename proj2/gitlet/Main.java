@@ -200,5 +200,9 @@ public class Main {
             System.out.println("Incorrect operands.");
             System.exit(0);
         }
+        if (!args[0].equals("init") && !Repository.GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
     }
 }
