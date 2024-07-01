@@ -12,6 +12,7 @@
 !.gitignore
 !library-sp21
 !foods.csv
+!*.in
 *.class
 *.log
 *.ctxt

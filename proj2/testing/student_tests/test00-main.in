@@ -1,0 +1,9 @@
+# Try a non-exist command arg
+> ANotExistCommand.
+No command with that name exists.
+<<<
+
+# Try empty arg
+>
+Please enter a command.
+<<<

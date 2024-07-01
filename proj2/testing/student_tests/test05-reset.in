@@ -1,0 +1,61 @@
+I definitions.inc
+> init
+<<<
+
+
++ wug1.txt wug.txt
+> add wug1.txt
+<<<
+> commit "wug1 added"
+<<<
++ wug2.txt wug.txt
+> add wug2.txt
+<<<
+> commit "wug2 added"
+<<<
+> log
+===
+${COMMIT_HEAD}
+wug2 added
+
+===
+${COMMIT_HEAD}
+wug1 added
+
+===
+${COMMIT_HEAD}
+initial commit
+
+<<<*
+D UID3 "${1}"
+D UID2 "${2}"
+D UID1 "${3}"
+
+# Test reset command
+# Should fail because no commit id
+> reset
+Incorrect operands.
+<<<
+
+# Should fail because not a commit id
+> reset not_a_commit_id
+No commit with that id exists.
+<<<
+
+# Should succeed
++ wug3.txt wug.txt
+> reset ${UID2}
+<<<
+> log
+===
+${COMMIT_HEAD}
+wug1 added
+
+===
+${COMMIT_HEAD}
+initial commit
+
+<<<*
+E wug3.txt
+* wug2.txt
+E wug1.txt
