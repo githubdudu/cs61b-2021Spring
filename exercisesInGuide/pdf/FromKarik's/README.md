@@ -1,0 +1,1 @@
+Resources from Kartik Kapur - one of CS61b TA's website https://www.kartikkapur.com/
