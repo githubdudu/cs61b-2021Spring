@@ -7,11 +7,58 @@ Ref:https://sp21.datastructur.es/materials/lectures/lec25/lec25
 ### C level
 
 1. Suppose we have an edgeTo[] and a distTo[] array, how would we implement a `public int distTo(int w)` method? How would we implement a `public Iterable<int> pathTo(int w)` method, where `distTo` returns the length of the shortest path and `pathTo` returns an Iterable of vertices where the 0th element is the source, the 1st element in the next item from the source towards w, and so forth.
+
+   **Answer**: It is a shortest path problem. It is Breadth First Paths algorithm should be applied.  See the Algorithm 4.2 on textbook. A copy of the algorithm is under folder C1.
+
 2. Problem 4 from [Princeton’s Fall 2009 final](http://www.cs.princeton.edu/courses/archive/spring15/cos226/exams/fin-f09.pdf).
+
+   **Answer:** (a)
+
+   ```
+   vertex:   A C D  F  H  E  B  G  I
+   
+   Distance: 0 1 12 20 25 28 34 40 53
+   ```
+
+   (b) Omit graph. A-C, C-D, C-B, D-F, F-H, H-E, E-G, G-I
+
 3. True or false: Adding a constant to every edge weight does not change the solution to the single-source shortest-paths problem.
+
+   **Answer:** False. Example: 
+
+   ```
+   A -1-> B -1-> C, A -3-> C
+   ```
+
+   The SPT is A-B-C. If we add 100 to each edge.
+
+   ```
+   A -101-> B -101-> C, A -103-> C
+   ```
+
+   The shortest path becomes A-B, A-C
+
 4. True or false: Multiplying a positive constant to every edge weight does not change the solution to the single-source shortest-paths problem.
+
+   **Answer:** True.  Let's say, the shortest path will not change if you drive slower on the road.
+
 5. Problem 1c and 1d from [my Spring 2016 final](https://tbp.berkeley.edu/exams/5662/download/).
+
+   **Answer:**
+
+   1c: A C B D E G F
+
+   1d: 8 14
+
 6. Problem 9 from [my Spring 2015 final](https://tbp.berkeley.edu/exams/4911/download/).
+
+   **Answer:** a. A B C D F H G E
+
+   b. Vertex `E` and vertex `H` to `-3`. 
+
+   c. A0 B3 (D5) H7 G11
+
+   
 
 ### B level
 
