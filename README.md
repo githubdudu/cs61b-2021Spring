@@ -35,4 +35,14 @@ The sequence or the numbers of guide of each lec and the sequence or the numbers
 
 Some lessons don't have exercises(or guide). So the number of exercises(lec folders) is not consecutive.
 
+We can tell some exercises in guide are from Princeton course cos226 https://www.cs.princeton.edu/courses/archive/fall23/cos226/lectures.php. 
+
+> Study guide. Associated with each lecture is a study guide, which summarizes the most important topics and ideas from the lecture. It also includes optional (and ungraded) exercises.
+>
+> C level: requires that you be able to carry out the algorithm mechanically. Similar to many of the Quizzera quizzes.
+>
+> B level: requires that you really understand what is going on. The exams will have plenty of these.
+>
+> A level: requires deep comprehension, involves clever tricks, covers tangential material (or perhaps even all three).
+
 It's meaningless to do guide of lec22. What has been taught and the exercises don't match.
