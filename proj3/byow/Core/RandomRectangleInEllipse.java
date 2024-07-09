@@ -28,10 +28,10 @@ import static java.lang.Thread.sleep;
 public class RandomRectangleInEllipse {
 
     private static final int LAMBDA = 7;
-    public final double ELLIPSE_A_DEFAULT = 70;
-    public final double ELLIPSE_B_DEFAULT = 10;
-    public final double ellipseA;
-    public final double ellipseB;
+    private final double ELLIPSE_A_DEFAULT = 70;
+    private final double ELLIPSE_B_DEFAULT = 10;
+    private final double ellipseA;
+    private final double ellipseB;
     private final Random RANDOM;
 
     public RandomRectangleInEllipse(long Seed) {
