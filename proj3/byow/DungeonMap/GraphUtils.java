@@ -1,4 +1,4 @@
-package byow.Core;
+package byow.DungeonMap;
 
 import edu.princeton.cs.introcs.StdDraw;
 

@@ -1,5 +1,6 @@
-package byow.Core;
+package byow.DungeonMap;
 
+import byow.Core.RandomUtils;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
