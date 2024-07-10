@@ -61,7 +61,10 @@ public class DungeonMap {
      * @return the rectangles array
      */
     public static Rectangle[] getRandomRectanglesInCenter(int count, Point center) {
-        RandomRectangleInEllipse rre = new RandomRectangleInEllipse(123L);
+        final double ELLIPSE_A_DEFAULT = 70;
+        final double ELLIPSE_B_DEFAULT = 10;
+        RandomRectangleInEllipse rre = new RandomRectangleInEllipse(ELLIPSE_A_DEFAULT,
+                ELLIPSE_B_DEFAULT, 123L);
         Rectangle[] rectangles = new Rectangle[count];
         for (int i = 0; i < rectangles.length; i++) {
             rectangles[i] = rre.nextRectangle();

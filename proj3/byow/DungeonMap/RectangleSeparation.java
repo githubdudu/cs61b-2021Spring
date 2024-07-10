@@ -10,6 +10,15 @@ public class RectangleSeparation {
 
     private static final Random RANDOM = new Random(123L);
 
+    /**
+     * Separate out the rectangles that are overlapping.
+     * The rectangles are randomly shuffled to avoid the case that the rectangles are jammed between
+     * others and are moving back and forth.
+     * <p>
+     * This method will change the original rectangles.
+     *
+     * @param rectangles the array of rectangles
+     */
     public static void separateOut(Rectangle[] rectangles) {
         boolean overlapping = true;
         while(overlapping) {
@@ -29,6 +38,16 @@ public class RectangleSeparation {
         }
     }
 
+    /**
+     * Returns a vector that separates the two rectangles.
+     * The vector.x is either -1, 0, or 1.
+     * The vector.y is either -1, 0, or 1.
+     *
+     * @param rectangles the array of rectangles
+     * @param i          the index of the first rectangle
+     * @param j          the index of the second rectangle
+     * @return the separation vector
+     */
     private static Point separationVector(Rectangle[] rectangles, int i, int j) {
         Point sep = new Point();
         Point c1 = new Point((int) rectangles[i].getCenterX(), (int) rectangles[i].getCenterY());
@@ -45,7 +64,7 @@ public class RectangleSeparation {
 
 
     public static void main(String[] args) {
-        RandomRectangleInEllipse rre = new RandomRectangleInEllipse(123L);
+        RandomRectangleInEllipse rre = new RandomRectangleInEllipse(70, 10, 123L);
         Point CENTER = GraphUtils.CENTER;
 
         Rectangle[] rectangles = new Rectangle[60];

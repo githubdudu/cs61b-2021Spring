@@ -29,17 +29,9 @@ import static java.lang.Thread.sleep;
 public class RandomRectangleInEllipse {
 
     private static final int LAMBDA = 7;
-    private final double ELLIPSE_A_DEFAULT = 70;
-    private final double ELLIPSE_B_DEFAULT = 10;
     private final double ellipseA;
     private final double ellipseB;
     private final Random RANDOM;
-
-    public RandomRectangleInEllipse(long Seed) {
-        this.ellipseA = ELLIPSE_A_DEFAULT;
-        this.ellipseB = ELLIPSE_B_DEFAULT;
-        this.RANDOM = new Random(Seed);
-    }
 
     public RandomRectangleInEllipse(double ellipseA, double ellipseB, long Seed) {
         this.ellipseA = ellipseA;
@@ -47,14 +39,35 @@ public class RandomRectangleInEllipse {
         this.RANDOM = new Random(Seed);
     }
 
+    /**
+     * Returns a random Rectangle2D.Double its center is random positioned in the ellipse.
+     * Its width and height are randomly generated using Poisson distribution.
+     * All the values are double.
+     *
+     * @return the random rectangle type of Rectangle2D.Double
+     */
     public Rectangle2D.Double nextRectangle2D() {
         return randomRectangle2D();
     }
 
+    /**
+     * Returns a random Rectangle its center is random positioned in the ellipse.
+     * Its width and height are randomly generated using Poisson distribution.
+     * All the values are integers.
+     *
+     * @return the random rectangle type of Rectangle
+     */
     public Rectangle nextRectangle() {
         return randomRectangle();
     }
 
+    /**
+     * Returns a random Rectangle its center is random positioned in the ellipse.
+     * Its width and height are randomly generated using Poisson distribution.
+     * All the values are integers.
+     *
+     * @return the random rectangle type of Rectangle
+     */
     private Rectangle randomRectangle() {
         Point2D.Double p1 = randomPointInEllipse(ellipseA, ellipseB);
         int width = randomWidth();
@@ -62,6 +75,13 @@ public class RandomRectangleInEllipse {
         return new Rectangle((int) (p1.x - width / 2), (int) (p1.y - height / 2), width, height);
     }
 
+    /**
+     * Returns a random Rectangle2D.Double its center is random positioned in the ellipse.
+     * Its width and height are randomly generated using Poisson distribution.
+     * All the values are double.
+     *
+     * @return the random rectangle type of Rectangle2D.Double
+     */
     private Rectangle2D.Double randomRectangle2D() {
         Point2D.Double p1 = randomPointInEllipse(ellipseA, ellipseB);
         double width = randomWidth();
@@ -88,10 +108,11 @@ public class RandomRectangleInEllipse {
     }
 
     /**
-     * Returns a random point in the circle
+     * Returns a random point in the circle.
+     * Values are double.
      *
-     * @param radius
-     * @return
+     * @param radius the radius of the circle
+     * @return the random point
      */
     private Point2D.Double randomPointInCircle(double radius) {
         return randomPointInEllipse(radius, radius);
@@ -99,10 +120,11 @@ public class RandomRectangleInEllipse {
 
     /**
      * Returns a random point in the ellipse.
+     * Values are double.
      *
-     * @param a
-     * @param b
-     * @return
+     * @param a the major axis of ellipse
+     * @param b the minor axis of ellipse
+     * @return the random point
      */
     private Point2D.Double randomPointInEllipse(double a, double b) {
         // Using the polar coordinate system.
@@ -119,7 +141,10 @@ public class RandomRectangleInEllipse {
             System.out.println("Please input args like \"circleConsecutive 100\"");
             System.exit(0);
         }
-        RandomRectangleInEllipse randomRectangle = new RandomRectangleInEllipse(123L);
+        final double ELLIPSE_A_DEFAULT = 70;
+        final double ELLIPSE_B_DEFAULT = 10;
+        RandomRectangleInEllipse randomRectangle = new RandomRectangleInEllipse(ELLIPSE_A_DEFAULT,
+                ELLIPSE_B_DEFAULT, 123L);
 
         final int WIDTH = 100;
         final int HEIGHT = 50;
