@@ -7,11 +7,14 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 public class GraphUtils {
-    final static int WIDTH = 100;
-    final static int HEIGHT = 60;
-    final static int RADIUS = 30;
-    final static int GRID_SIZE = 16;
-    final static Point CENTER = new Point(WIDTH / 2, HEIGHT / 2);
+    public final static int WIDTH = 100;
+    public final static int HEIGHT = 60;
+    public final static int GRID_SIZE = 16;
+    public final static double ELLIPSE_A_DEFAULT = 70;
+    public final static double ELLIPSE_B_DEFAULT = 10;
+    public final static Point CENTER = new Point(WIDTH / 2, HEIGHT / 2);
+    public final static int CELL_COUNT = 60;
+    public final static double SIZE_THRESHOLD = 1.05;
 
     public static Point2D translate(Point2D p, Point2D center) {
         return new Point2D.Double(p.getX() + center.getX(), p.getY() + center.getY());
