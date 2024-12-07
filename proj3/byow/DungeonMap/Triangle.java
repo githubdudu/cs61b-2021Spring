@@ -1,5 +1,6 @@
 package byow.DungeonMap;
 
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class Triangle {
      * Representing the edge of the triangle.
      * Inner class of Triangle.
      */
-    public static class Edge extends Line2D.Double {
+    public static class Side extends Line2D.Double {
         /**
          * Construct an edge with two points.
          * Sort the points by x-coordinate, if two points have the same x-coordinate,
@@ -49,19 +50,21 @@ public class Triangle {
          * @param p1 point 1
          * @param p2 point 2
          */
-        Edge(Point2D p1, Point2D p2) {
-            super(p1, p2);
-            if (p1.getX() > p2.getX() || p1.getX() == p2.getX() && p1.getY() > p2.getY()) {
+        Side(Point2D p1, Point2D p2) {
+            super();
+            if (p1.getX() < p2.getX() || p1.getX() == p2.getX() && p1.getY() < p2.getY()) {
+                setLine(p1, p2);
+            } else {
                 setLine(p2, p1);
             }
         }
 
         /**
-         * Check if two edges are equal.
+         * Check if two sides are equal.
          * They are equal if they have the same points.
          *
          * @param obj the object to compare
-         * @return true if the two edges are equal
+         * @return true if the two sides are equal
          */
         @Override
         public boolean equals(Object obj) {
@@ -86,15 +89,15 @@ public class Triangle {
     }
 
     /**
-     * Get the edges of the triangle
+     * Get three sides of the triangle
      *
-     * @return the edges of the triangle
+     * @return three sides of the triangle
      */
-    public Edge[] edges() {
-        return new Edge[]{
-                new Edge(a, b),
-                new Edge(b, c),
-                new Edge(c, a)
+    public Side[] getSides() {
+        return new Side[]{
+                new Side(a, b),
+                new Side(b, c),
+                new Side(c, a)
         };
     }
 
@@ -104,7 +107,17 @@ public class Triangle {
      * @param p the point
      * @return true if the triangle contains the point p in its circumcircle
      */
-    public boolean circumCircleContains(Point2D p) {
+    public boolean circumcircleContains(Point2D p) {
+        Ellipse2D circle = getCircumcircle();
+        return circle.contains(p);
+    }
+
+    /**
+     * Get the circumcircle of the triangle
+     *
+     * @return the circumcircle of the triangle
+     */
+    private Ellipse2D getCircumcircle(){
         double ax = a.getX();
         double ay = a.getY();
         double bx = b.getX();
@@ -117,9 +130,9 @@ public class Triangle {
         double uy = ((ax * ax + ay * ay) * (cx - bx) + (bx * bx + by * by) * (ax - cx) +
                 (cx * cx + cy * cy) * (bx - ax)) / d;
         double r = Math.sqrt((ax - ux) * (ax - ux) + (ay - uy) * (ay - uy));
-        double distance = Math.sqrt(
-                (p.getX() - ux) * (p.getX() - ux) + (p.getY() - uy) * (p.getY() - uy));
-        return distance < r;
+        // The circle is centered at (ux, uy) with radius r
+        // The bounding box is (ux - r, uy - r, 2 * r, 2 * r)
+        return new Ellipse2D.Double(ux - r, uy - r, 2 * r, 2 * r);
     }
 
     /**
