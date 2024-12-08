@@ -50,7 +50,7 @@ public class Triangle {
          * @param p1 point 1
          * @param p2 point 2
          */
-        Side(Point2D p1, Point2D p2) {
+        public Side(Point2D p1, Point2D p2) {
             super();
             if (p1.getX() < p2.getX() || p1.getX() == p2.getX() && p1.getY() < p2.getY()) {
                 setLine(p1, p2);

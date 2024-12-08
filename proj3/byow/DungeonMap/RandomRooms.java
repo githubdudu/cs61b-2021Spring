@@ -3,7 +3,7 @@ package byow.DungeonMap;
 import byow.Core.RandomUtils;
 
 import java.awt.*;
-import java.awt.geom.Point2D;
+import java.awt.geom.Ellipse2D;
 import java.util.Random;
 
 /**
@@ -24,85 +24,38 @@ import java.util.Random;
  */
 public class RandomRooms {
 
-    private static final int LAMBDA = 7;
+    public static final int LAMBDA = 7;
+    public static Ellipse2D ELLIPSE;
 
     /**
      * Returns N rectangles that are not overlapping and randomly positioned in the room / canvas.
      * The room is defined by the width and height.
      *
-     * @param random     the random object
-     * @param N          the number of rectangles we want to generate
-     * @param roomWidth  the width of the room
-     * @param roomHeight the height of the room
+     * @param random the random object
+     * @param N      the number of rectangles we want to generate
      * @return the array of rectangles
      */
-    public static Rectangle[] randomRooms(Random random, int N, double roomWidth,
-                                          double roomHeight) {
-        Point2D center = new Point2D.Double(roomWidth / 2, roomHeight / 2);
-        double ellipseA = GraphUtils.ELLIPSE_A_DEFAULT;
-        double ellipseB = GraphUtils.ELLIPSE_B_DEFAULT;
-        Rectangle[] overlappedRect = randomRectanglesInEllipse(random, N, center, ellipseA,
-                ellipseB);
+    public static Rectangle[] randomRooms(Random random, int N) {
+        Rectangle[] overlappedRect = new Rectangle[N];
+        ELLIPSE = getCenterEllipse();
+        RandomRectangle rRect = new RandomRectangle(random, ELLIPSE, LAMBDA);
+        for (int i = 0; i < N; i++) {
+            overlappedRect[i] = rRect.nextRectangle();
+        }
         separateOut(random, overlappedRect);
         return overlappedRect;
     }
 
     /**
-     * Returns N Rectangles their centers are random positioned in the ellipse specified by center,
-     * ellipseA and ellipseB.
-     * Its width and height are randomly generated using Poisson distribution.
-     * All the values are integers.
+     * Returns the ellipse that is centered at the center of the canvas.
      *
-     * @param random   the random object
-     * @param N        the number of rectangles we want to generate
-     * @param center   the center of the ellipse
-     * @param ellipseA the major axis of the ellipse
-     * @param ellipseB the minor axis of the ellipse
-     * @return the array of rectangles
+     * @return the ellipse
      */
-    public static Rectangle[] randomRectanglesInEllipse(Random random, int N, Point2D center,
-                                                        double ellipseA, double ellipseB) {
-        Rectangle[] rectangles = new Rectangle[N];
-        for (int i = 0; i < N; i++) {
-            Point2D.Double centerOfRect = randomPointInEllipse(random, ellipseA, ellipseB);
-            int width = RandomUtils.poisson(random, LAMBDA);
-            int height = RandomUtils.poisson(random, LAMBDA);
-            int x = (int) (centerOfRect.x - width / 2 + center.getX());
-            int y = (int) (centerOfRect.y - height / 2 + center.getY());
-            rectangles[i] = new Rectangle(x, y, width, height);
-        }
-        return rectangles;
-    }
-
-    /**
-     * Returns a random point in the circle.
-     * Values are double.
-     *
-     * @param random the random object
-     * @param radius the radius of the circle
-     * @return the random point
-     */
-    private static Point2D.Double randomPointInCircle(Random random, double radius) {
-        return randomPointInEllipse(random, radius, radius);
-    }
-
-    /**
-     * Returns a random point in the ellipse.
-     * Values are double.
-     *
-     * @param random the random object
-     * @param a      the major axis of ellipse
-     * @param b      the minor axis of ellipse
-     * @return the random point
-     */
-    private static Point2D.Double randomPointInEllipse(Random random, double a, double b) {
-        // Using the polar coordinate system.
-        // Angle is between 0 and 2 * PI
-        double angle = RandomUtils.uniform(random, 0, 2 * Math.PI);
-        // Credit: https://stackoverflow.com/a/5838055
-        double u = random.nextDouble() + random.nextDouble();
-        double r = u > 1 ? 2 - u : u;
-        return new Point2D.Double((a * r * Math.cos(angle) / 2), (b * r * Math.sin(angle) / 2));
+    public static Ellipse2D.Double getCenterEllipse() {
+        return new Ellipse2D.Double(GraphUtils.CENTER.x - GraphUtils.ELLIPSE_A_DEFAULT / 2,
+                GraphUtils.CENTER.y - GraphUtils.ELLIPSE_B_DEFAULT / 2,
+                GraphUtils.ELLIPSE_A_DEFAULT,
+                GraphUtils.ELLIPSE_B_DEFAULT);
     }
 
     /**

@@ -3,6 +3,7 @@ package byow.DungeonMap;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -24,8 +25,12 @@ public class GraphUtils {
         return new Point((int) Math.round(p2.getX()), (int) Math.round(p2.getY()));
     }
 
-    public static void DrawRect(Rectangle2D r) {
+    public static void drawRect(Rectangle2D r) {
         StdDraw.rectangle(r.getCenterX(), r.getCenterY(), r.getWidth() / 2, r.getHeight() / 2);
+    }
+
+    public static void drawEllipse(Ellipse2D e) {
+        StdDraw.ellipse(e.getCenterX(), e.getCenterY(), e.getWidth() / 2, e.getHeight() / 2);
     }
 
     public static void init() {
