@@ -24,7 +24,6 @@ import java.util.Random;
  */
 public class RandomRooms {
 
-    public static final int LAMBDA = 7;
     public static Ellipse2D ELLIPSE;
 
     /**
@@ -35,10 +34,10 @@ public class RandomRooms {
      * @param N      the number of rectangles we want to generate
      * @return the array of rectangles
      */
-    public static Rectangle[] randomRooms(Random random, int N) {
+    public static Rectangle[] randomRooms(Random random, int N, int lambda) {
         Rectangle[] overlappedRect = new Rectangle[N];
         ELLIPSE = getCenterEllipse();
-        RandomRectangle rRect = new RandomRectangle(random, ELLIPSE, LAMBDA);
+        RandomRectangle rRect = new RandomRectangle(random, ELLIPSE, lambda);
         for (int i = 0; i < N; i++) {
             overlappedRect[i] = rRect.nextRectangle();
         }

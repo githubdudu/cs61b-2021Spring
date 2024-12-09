@@ -28,15 +28,12 @@ public class RandomRoomsTest {
                 // Test Rectangles generation
                 StdDraw.ellipse(CENTER.x, CENTER.y, ELLIPSE_A_DEFAULT / 2,
                         ELLIPSE_B_DEFAULT / 2);
-                Rectangle[] rectangles = RandomRooms.randomRectanglesInEllipse(random, N,
-                        CENTER,
-                        ELLIPSE_A_DEFAULT, ELLIPSE_B_DEFAULT);
+                Rectangle[] rectangles = RandomRooms.randomRooms(random, N, 7);
                 for (int i = 0; i < N; i++) {
                     Rectangle r = rectangles[i];
                     StdDraw.setPenColor(colors[i % colors.length]);
                     System.out.println(r);
-                    StdDraw.rectangle(r.getCenterX(), r.getCenterY(),
-                            r.getWidth() / 2, r.getHeight() / 2);
+                    GraphUtils.drawRect(r);
                 }
 
                 // Test RectangleSeparation
@@ -44,7 +41,7 @@ public class RandomRoomsTest {
                 StdDraw.setPenColor();
                 RandomRooms.separateOut(random, rectangles);
                 for (int i = 0; i < rectangles.length; i++) {
-                    GraphUtils.DrawRect(rectangles[i]);
+                    GraphUtils.drawRect(rectangles[i]);
                     StdDraw.text(rectangles[i].getX(), rectangles[i].getY(), i + "");
                 }
                 break;

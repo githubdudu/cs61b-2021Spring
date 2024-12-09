@@ -13,9 +13,22 @@ public class GraphUtils {
     public final static int GRID_SIZE = 16;
     public final static double ELLIPSE_A_DEFAULT = 70;
     public final static double ELLIPSE_B_DEFAULT = 10;
+    /**
+     * The center of the canvas.
+     */
     public final static Point CENTER = new Point(WIDTH / 2, HEIGHT / 2);
+    /**
+     * The number of rectangles to create.
+     */
     public final static int CELL_COUNT = 60;
-    public final static double SIZE_THRESHOLD = 1.05;
+    /**
+     * The threshold to determine the main rooms.
+     */
+    public final static double SIZE_THRESHOLD = 1.00;
+    /**
+     * The lambda value for the Poisson distribution to generate the width and height of the rectangle.
+     */
+    public static final int LAMBDA = 7;
 
     public static Point2D translate(Point2D p, Point2D center) {
         return new Point2D.Double(p.getX() + center.getX(), p.getY() + center.getY());
