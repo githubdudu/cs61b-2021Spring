@@ -8,27 +8,16 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 public class GraphUtils {
-    public final static int WIDTH = 100;
-    public final static int HEIGHT = 60;
-    public final static int GRID_SIZE = 16;
-    public final static double ELLIPSE_A_DEFAULT = 70;
-    public final static double ELLIPSE_B_DEFAULT = 10;
+    final public static Settings SETTINGS1 = new Settings(100, 60, 16, 70, 10, 60, 1.05, 7);
+    final public static Settings SETTINGS2 = new Settings(100, 60, 8, 70, 10, 60, 1.00, 7);
     /**
-     * The center of the canvas.
+     * 1920 X 1080
      */
-    public final static Point CENTER = new Point(WIDTH / 2, HEIGHT / 2);
+    final public static Settings SETTINGS3 = new Settings(240, 135, 8, 70, 10, 60, 1.05, 7);
     /**
-     * The number of rectangles to create.
+     * 1920 X 1080
      */
-    public final static int CELL_COUNT = 60;
-    /**
-     * The threshold to determine the main rooms.
-     */
-    public final static double SIZE_THRESHOLD = 1.00;
-    /**
-     * The lambda value for the Poisson distribution to generate the width and height of the rectangle.
-     */
-    public static final int LAMBDA = 7;
+    final public static Settings SETTINGS4 = new Settings(120, 67, 16, 70, 10, 60, 1.05, 7);
 
     public static Point2D translate(Point2D p, Point2D center) {
         return new Point2D.Double(p.getX() + center.getX(), p.getY() + center.getY());
@@ -42,13 +31,24 @@ public class GraphUtils {
         StdDraw.rectangle(r.getCenterX(), r.getCenterY(), r.getWidth() / 2, r.getHeight() / 2);
     }
 
+    public static void drawRect(Rectangle2D r, String subtext) {
+        drawRect(r);
+        StdDraw.text(r.getX(), r.getY(), subtext);
+    }
+
     public static void drawEllipse(Ellipse2D e) {
         StdDraw.ellipse(e.getCenterX(), e.getCenterY(), e.getWidth() / 2, e.getHeight() / 2);
     }
 
-    public static void init() {
-        StdDraw.setCanvasSize(WIDTH * GRID_SIZE, HEIGHT * GRID_SIZE);
-        StdDraw.setXscale(0, WIDTH);
-        StdDraw.setYscale(0, HEIGHT);
+    public static void drawEllipse(Ellipse2D e, String subtext) {
+        drawEllipse(e);
+        StdDraw.text(e.getX(), e.getY(), subtext);
+    }
+
+    public static void initCanvas(Settings settings) {
+        StdDraw.setCanvasSize(settings.WIDTH * settings.GRID_SIZE,
+                settings.HEIGHT * settings.GRID_SIZE);
+        StdDraw.setXscale(0, settings.WIDTH);
+        StdDraw.setYscale(0, settings.HEIGHT);
     }
 }

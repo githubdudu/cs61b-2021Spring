@@ -1,13 +1,13 @@
 package byow.DungeonMap.Test;
 
+import byow.DungeonMap.DungeonMap;
 import byow.DungeonMap.GraphUtils;
 import byow.DungeonMap.RandomRooms;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.util.Random;
-
-import static byow.DungeonMap.GraphUtils.*;
 
 public class RandomRoomsTest {
     public static void main(String[] args) {
@@ -17,7 +17,7 @@ public class RandomRoomsTest {
             System.exit(0);
         }
 
-        GraphUtils.init();
+        GraphUtils.initCanvas(GraphUtils.SETTINGS1);
 
         Random random = new Random(123L);
         final int N = Integer.parseInt(args[1]);
@@ -26,23 +26,15 @@ public class RandomRoomsTest {
         switch (args[0]) {
             case "rectangle":
                 // Test Rectangles generation
-                StdDraw.ellipse(CENTER.x, CENTER.y, ELLIPSE_A_DEFAULT / 2,
-                        ELLIPSE_B_DEFAULT / 2);
-                Rectangle[] rectangles = RandomRooms.randomRooms(random, N, 7);
+                Ellipse2D el = new DungeonMap(GraphUtils.SETTINGS1).getCenterEllipse();
+                GraphUtils.drawEllipse(el);
+                RandomRooms rr = new RandomRooms(random, el, N, 7);
+                Rectangle[] rectangles = rr.getRooms();
                 for (int i = 0; i < N; i++) {
                     Rectangle r = rectangles[i];
                     StdDraw.setPenColor(colors[i % colors.length]);
                     System.out.println(r);
-                    GraphUtils.drawRect(r);
-                }
-
-                // Test RectangleSeparation
-                StdDraw.clear();
-                StdDraw.setPenColor();
-                RandomRooms.separateOut(random, rectangles);
-                for (int i = 0; i < rectangles.length; i++) {
-                    GraphUtils.drawRect(rectangles[i]);
-                    StdDraw.text(rectangles[i].getX(), rectangles[i].getY(), i + "");
+                    GraphUtils.drawRect(r, String.format("%d", i));
                 }
                 break;
             default:

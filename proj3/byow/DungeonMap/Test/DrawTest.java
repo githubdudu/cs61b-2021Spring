@@ -1,13 +1,12 @@
 package byow.DungeonMap.Test;
 
+import byow.DungeonMap.DungeonMap;
 import byow.DungeonMap.GraphUtils;
 import byow.DungeonMap.RandomRectangle;
 import byow.DungeonMap.RandomRooms;
-
 import edu.princeton.cs.introcs.StdDraw;
-import org.junit.Test;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -22,11 +21,11 @@ public class DrawTest {
     private final Color[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA};
     @Before
     public void setUp() {
-        GraphUtils.init();
+        GraphUtils.initCanvas(GraphUtils.SETTINGS1);
     }
     @Test
     public void testGenerationOfRandomRectangle() throws InterruptedException {
-        Ellipse2D ellipse = RandomRooms.getCenterEllipse();
+        Ellipse2D ellipse = new DungeonMap(GraphUtils.SETTINGS1).getCenterEllipse();
         GraphUtils.drawEllipse(ellipse);
 
         RandomRectangle randomRectangle = new RandomRectangle(random, ellipse, 7);
@@ -41,7 +40,8 @@ public class DrawTest {
 
     @Test
     public void testGenerationOfRandomRooms() throws InterruptedException {
-        Rectangle[] rectangles = RandomRooms.randomRooms(random, 100, 7);
+        Rectangle[] rectangles = new RandomRooms(random,
+                new DungeonMap(GraphUtils.SETTINGS1).getCenterEllipse(), 100, 7).getRooms();
         for (int i = 0; i < rectangles.length; i++) {
             StdDraw.setPenColor(colors[i % colors.length]);
             drawRectInnerLine(rectangles[i]);

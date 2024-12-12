@@ -23,38 +23,28 @@ import java.util.Random;
  * convert them to half-width and half-height.
  */
 public class RandomRooms {
-
-    public static Ellipse2D ELLIPSE;
-
+    private final Rectangle[] rooms;
     /**
-     * Returns N rectangles that are not overlapping and randomly positioned in the room / canvas.
+     * Generate N rectangles that are not overlapping and randomly positioned in the room / canvas.
      * The room is defined by the width and height.
      *
-     * @param random the random object
-     * @param N      the number of rectangles we want to generate
-     * @return the array of rectangles
+     * @param random      the random object
+     * @param centerScope the ellipse that the center of the generated rectangles should be in
+     * @param N           the number of rectangles we want to generate
+     * @param lambda      the lambda of the Poisson distribution of width and height
      */
-    public static Rectangle[] randomRooms(Random random, int N, int lambda) {
+    public RandomRooms(Random random, Ellipse2D centerScope, int N, int lambda) {
         Rectangle[] overlappedRect = new Rectangle[N];
-        ELLIPSE = getCenterEllipse();
-        RandomRectangle rRect = new RandomRectangle(random, ELLIPSE, lambda);
+        RandomRectangle rRect = new RandomRectangle(random, centerScope, lambda);
         for (int i = 0; i < N; i++) {
             overlappedRect[i] = rRect.nextRectangle();
         }
         separateOut(random, overlappedRect);
-        return overlappedRect;
+        rooms = removeOutliers(overlappedRect);
     }
 
-    /**
-     * Returns the ellipse that is centered at the center of the canvas.
-     *
-     * @return the ellipse
-     */
-    public static Ellipse2D.Double getCenterEllipse() {
-        return new Ellipse2D.Double(GraphUtils.CENTER.x - GraphUtils.ELLIPSE_A_DEFAULT / 2,
-                GraphUtils.CENTER.y - GraphUtils.ELLIPSE_B_DEFAULT / 2,
-                GraphUtils.ELLIPSE_A_DEFAULT,
-                GraphUtils.ELLIPSE_B_DEFAULT);
+    public Rectangle[] getRooms() {
+        return rooms;
     }
 
     /**
@@ -67,7 +57,7 @@ public class RandomRooms {
      * @param random     the random object
      * @param rectangles the array of rectangles
      */
-    public static void separateOut(Random random, Rectangle[] rectangles) {
+    public void separateOut(Random random, Rectangle[] rectangles) {
         boolean overlapping = true;
         while (overlapping) {
             overlapping = false;
@@ -95,7 +85,7 @@ public class RandomRooms {
      * @param r2 the second rectangle
      * @return the separation vector
      */
-    private static Point separationVector(Rectangle r1, Rectangle r2) {
+    private Point separationVector(Rectangle r1, Rectangle r2) {
         Point vector = new Point();
         Point c1 = new Point((int) r1.getCenterX(), (int) r1.getCenterY());
         Point c2 = new Point((int) r2.getCenterX(), (int) r2.getCenterY());
@@ -107,5 +97,9 @@ public class RandomRooms {
         vector.y = (int) Math.round((c1.y - c2.y) / distance);
 
         return vector;
+    }
+
+    private Rectangle[] removeOutliers(Rectangle[] rectangles) {
+        return rectangles;
     }
 }

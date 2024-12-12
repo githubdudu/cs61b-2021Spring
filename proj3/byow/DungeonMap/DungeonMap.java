@@ -3,25 +3,63 @@ package byow.DungeonMap;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class DungeonMap {
-    private static final double SIZE_THRESHOLD = GraphUtils.SIZE_THRESHOLD;
+    private final Settings settings;
     private Rectangle[] rectangles;
     private List<Rectangle> mainRooms;
     private int[][] graph;
+
+    public DungeonMap(Settings settings) {
+        this.settings = settings;
+    }
+
     public void createMap() {
 
         Random random = new Random(123L);
-        rectangles = RandomRooms.randomRooms(random, GraphUtils.CELL_COUNT, GraphUtils.LAMBDA);
+        rectangles = new RandomRooms(random, getCenterEllipse(), settings.CELL_COUNT,
+                settings.LAMBDA).getRooms();
         mainRooms = selectMainRooms();
 
         List<Point2D> centers = getCenters(mainRooms);
         Set<Triangle> triangles = Delaunay.bowyerWatson(centers);
         System.out.println(triangles.size());
+    }
+
+    /**
+     * Returns the ellipse that is centered at the center of the canvas.
+     *
+     * @return the ellipse
+     */
+    public Ellipse2D.Double getCenterEllipse() {
+        return new Ellipse2D.Double(settings.CENTER.x - settings.ELLIPSE_A_DEFAULT / 2,
+                settings.CENTER.y - settings.ELLIPSE_B_DEFAULT / 2, settings.ELLIPSE_A_DEFAULT,
+                settings.ELLIPSE_B_DEFAULT);
+    }
+
+    public int[][] getMSTPath(List<Rectangle> rooms) {
+        List<Point2D> centers = getCenters(rooms);
+        Set<Triangle> triangles = Delaunay.bowyerWatson(centers);
+        return null;
+    }
+    /**
+     * Select rooms that their width and height are greater than the average width and height
+     * multiplied by the threshold.
+     *
+     * @return the list of selected rooms
+     */
+    private List<Rectangle> selectMainRooms() {
+        // average of the heights and width of all rooms
+        double avgHeight = getHeightAvg();
+        double avgWidth = getWidthAvg();
+        return Arrays.stream(rectangles).filter(
+                        r -> r.width > avgWidth * settings.SIZE_THRESHOLD && r.height > avgHeight * settings.SIZE_THRESHOLD)
+                .toList();
     }
 
     private double getWidthAvg() {
@@ -40,26 +78,6 @@ public class DungeonMap {
         return Arrays.stream(rectangles).mapToDouble(r -> r.height).sum();
     }
 
-    public int[][] getMSTPath(List<Rectangle> rooms) {
-        List<Point2D> centers = getCenters(rooms);
-        Set<Triangle> triangles = Delaunay.bowyerWatson(centers);
-        return null;
-    }
-    /**
-     * Select rooms that their width and height are greater than the average width and height
-     * multiplied by the threshold.
-     *
-     * @return the list of selected rooms
-     */
-    private List<Rectangle> selectMainRooms() {
-        // average of the heights and width of all rooms
-        double avgHeight = getHeightAvg();
-        double avgWidth = getWidthAvg();
-        return Arrays.stream(rectangles)
-                .filter(r -> r.width > avgWidth * SIZE_THRESHOLD && r.height > avgHeight * SIZE_THRESHOLD)
-                .toList();
-    }
-
     /**
      * Get the list of centers of a list of rooms.
      *
@@ -75,10 +93,10 @@ public class DungeonMap {
     }
 
     public static void main(String[] args) {
-        DungeonMap dungeonMap = new DungeonMap();
+        DungeonMap dungeonMap = new DungeonMap(GraphUtils.SETTINGS1);
         dungeonMap.createMap();
 
-        GraphUtils.init();
+        GraphUtils.initCanvas(GraphUtils.SETTINGS1);
         StdDraw.setPenColor(StdDraw.RED);
         for (Rectangle r : dungeonMap.mainRooms) {
             GraphUtils.drawRect(r);
