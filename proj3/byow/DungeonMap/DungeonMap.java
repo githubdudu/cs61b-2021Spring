@@ -28,7 +28,7 @@ public class DungeonMap {
 
         List<Point2D> centers = getCenters(mainRooms);
         Set<Triangle> triangles = new Delaunay().bowyerWatson(centers);
-        System.out.println(triangles.size());
+        System.out.println("There are " + triangles.size() + " triangles.");
     }
 
     /**
@@ -84,27 +84,22 @@ public class DungeonMap {
      * @param rooms a list of rooms
      * @return the list of centers
      */
-    public static List<Point2D> getCenters(List<Rectangle> rooms) {
-        List<Point2D> centers = new ArrayList<>();
-        for (Rectangle r : rooms) {
-            centers.add(new Point2D.Double(r.getCenterX(), r.getCenterY()));
-        }
-        return centers;
+    public List<Point2D> getCenters(List<Rectangle> rooms) {
+        return rooms.stream().map(
+                r -> (Point2D) new Point2D.Double(r.getCenterX(), r.getCenterY())).toList();
     }
 
     public static void main(String[] args) {
+        GraphUtils.initCanvas(GraphUtils.SETTINGS1);
         DungeonMap dungeonMap = new DungeonMap(GraphUtils.SETTINGS1);
-        GraphUtils.SETTINGS1.SIZE_THRESHOLD = 0.7;
-        GraphUtils.SETTINGS1.CELL_COUNT = 100;
         dungeonMap.createMap();
 
-        GraphUtils.initCanvas(GraphUtils.SETTINGS1);
         StdDraw.setPenColor(StdDraw.RED);
         for (Rectangle r : dungeonMap.mainRooms) {
             GraphUtils.drawRect(r);
         }
 
-        Set<Triangle> triangles = new Delaunay().bowyerWatson(getCenters(dungeonMap.mainRooms));
+        Set<Triangle> triangles = new Delaunay().bowyerWatson(dungeonMap.getCenters(dungeonMap.mainRooms));
         StdDraw.setPenColor(StdDraw.GREEN);
         for (Triangle triangle : triangles) {
             for (Line2D edge : triangle.getSides()) {

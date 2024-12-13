@@ -1,6 +1,7 @@
 package byow.DungeonMap;
 
 import byow.Core.RandomUtils;
+import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -23,7 +24,7 @@ import java.util.Random;
  * convert them to half-width and half-height.
  */
 public class RandomRooms {
-    private final Rectangle[] rooms;
+    private Rectangle[] rooms;
     /**
      * Generate N rectangles that are not overlapping and randomly positioned in the room / canvas.
      * The room is defined by the width and height.
@@ -34,19 +35,25 @@ public class RandomRooms {
      * @param lambda      the lambda of the Poisson distribution of width and height
      */
     public RandomRooms(Random random, Ellipse2D centerScope, int N, int lambda) {
-        Rectangle[] overlappedRect = new Rectangle[N];
+        rooms = new Rectangle[N];
         RandomRectangle rRect = new RandomRectangle(random, centerScope, lambda);
         for (int i = 0; i < N; i++) {
-            overlappedRect[i] = rRect.nextRectangle();
+            rooms[i] = rRect.nextRectangle();
         }
-        separateOut(random, overlappedRect);
-        rooms = removeOutliers(overlappedRect);
+        draw();
+        separateOut(random);
+        rooms = removeOutliers(rooms);
     }
 
     public Rectangle[] getRooms() {
         return rooms;
     }
 
+    public void draw() {
+        for (Rectangle r : rooms) {
+            GraphUtils.drawRect(r);
+        }
+    }
     /**
      * Separate out the rectangles that are overlapping.
      * The rectangles are randomly shuffled to avoid the case that the rectangles are jammed between
@@ -55,24 +62,26 @@ public class RandomRooms {
      * This method will change the original rectangles.
      *
      * @param random     the random object
-     * @param rectangles the array of rectangles
      */
-    public void separateOut(Random random, Rectangle[] rectangles) {
+    public void separateOut(Random random) {
         boolean overlapping = true;
         while (overlapping) {
             overlapping = false;
-            RandomUtils.shuffle(random, rectangles);
-            for (int i = 0; i < rectangles.length; i++) {
-                for (int j = 0; j < rectangles.length; j++) {
-                    if (i != j && rectangles[i].intersects(rectangles[j])) {
-                        Point sep = separationVector(rectangles[i], rectangles[j]);
-                        rectangles[i].setRect(rectangles[i].getX() + sep.x,
-                                rectangles[i].getY() + sep.y,
-                                rectangles[i].getWidth(), rectangles[i].getHeight());
+            RandomUtils.shuffle(random, rooms);
+            for (int i = 0; i < rooms.length; i++) {
+                for (int j = 0; j < rooms.length; j++) {
+                    if (i != j && rooms[i].intersects(rooms[j])) {
+                        Point sep = separationVector(rooms[i], rooms[j]);
+                        rooms[i].setRect(rooms[i].getX() + sep.x,
+                                rooms[i].getY() + sep.y,
+                                rooms[i].getWidth(), rooms[i].getHeight());
                         overlapping = true;
                     }
                 }
             }
+
+            StdDraw.clear();
+            draw();
         }
     }
 
