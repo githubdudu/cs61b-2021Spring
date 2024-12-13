@@ -16,15 +16,12 @@ public class Delaunay {
      * Delaunay triangulation of a finite set of points in any number of dimensions.
      *
      * @param pointList pointList is a list of coordinates defining the points to be triangulated
-     * @return
+     * @return a set of triangles
      */
-    public static Set<Triangle> bowyerWatson(List<Point2D> pointList) {
+    public Set<Triangle> bowyerWatson(List<Point2D> pointList) {
         Set<Triangle> triangulation = new HashSet<>();
         // Super triangle must be large enough to completely contain all the points in pointList
-        Triangle superTriangle = new Triangle(new Point(-GraphUtils.SETTINGS1.HEIGHT, 0),
-                new Point(GraphUtils.SETTINGS1.WIDTH / 2,
-                        GraphUtils.SETTINGS1.HEIGHT + GraphUtils.SETTINGS1.WIDTH / 2),
-                new Point(GraphUtils.SETTINGS1.WIDTH + GraphUtils.SETTINGS1.HEIGHT, 0));
+        Triangle superTriangle = getSuperTriangle(GraphUtils.SETTINGS1.GRID_SIZE);
         triangulation.add(superTriangle);
 
         for (Point2D p : pointList) { // add all the points one at a time to the triangulation
@@ -58,4 +55,15 @@ public class Delaunay {
         return triangulation;
     }
 
+    /**
+     * Get the super triangle that used for the Bowyer-Watson algorithm.
+     *
+     * @param grid the size of the grid of canvas
+     * @return the super triangle
+     */
+    private Triangle getSuperTriangle(int grid) {
+        // if grid == 16, M = 1000
+        final int M = 16000 / grid;
+        return new Triangle(new Point(-M, -M), new Point(2 * M, -M), new Point(M, 2 * M));
+    }
 }
