@@ -1,5 +1,6 @@
 package byow.DungeonMap;
 
+import edu.princeton.cs.algs4.PrimMST;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
@@ -11,24 +12,31 @@ import java.util.*;
 
 public class DungeonMap {
     private final Settings settings;
+    private final Random random;
     private Rectangle[] rectangles;
     private List<Rectangle> mainRooms;
-    private int[][] graph;
+    private EuclideanEdgeWeightedGraph graph;
+    private EuclideanPrimMST mst;
 
     public DungeonMap(Settings settings) {
         this.settings = settings;
+        this.random = new Random(123L);
+        this.rectangles = new RandomRooms(random, getCenterEllipse(), settings.CELL_COUNT,
+                settings.LAMBDA).getRooms();
+        this.mainRooms = selectMainRooms();
+        List<Point2D> centers = getCenters(mainRooms);
+        Set<Triangle> triangles = new Delaunay().bowyerWatson(centers);
+        Set<Line2D> sides = this.getSides(triangles);
+        this.graph = new EuclideanEdgeWeightedGraph(sides, sides.size());
+        this.mst = new EuclideanPrimMST(this.graph);
+        this.graph.show();
+        this.mst.show();
+
+        System.out.println("There are " + triangles.size() + " triangles.");
     }
 
     public void createMap() {
 
-        Random random = new Random(123L);
-        rectangles = new RandomRooms(random, getCenterEllipse(), settings.CELL_COUNT,
-                settings.LAMBDA).getRooms();
-        mainRooms = selectMainRooms();
-
-        List<Point2D> centers = getCenters(mainRooms);
-        Set<Triangle> triangles = new Delaunay().bowyerWatson(centers);
-        System.out.println("There are " + triangles.size() + " triangles.");
     }
 
     /**
@@ -89,22 +97,25 @@ public class DungeonMap {
                 r -> (Point2D) new Point2D.Double(r.getCenterX(), r.getCenterY())).toList();
     }
 
+
+    private Set<Line2D> getSides(Iterable<Triangle> triangles) {
+        Set<Line2D> sides = new HashSet<>();
+        triangles.forEach(t -> {
+            sides.add(new Triangle.Side(t.a, t.b));
+            sides.add(new Triangle.Side(t.b, t.c));
+            sides.add(new Triangle.Side(t.c, t.a));
+        });
+        return sides;
+    }
+
     public static void main(String[] args) {
         GraphUtils.initCanvas(GraphUtils.SETTINGS1);
+        GraphUtils.SETTINGS1.SIZE_THRESHOLD = 1.0;
         DungeonMap dungeonMap = new DungeonMap(GraphUtils.SETTINGS1);
-        dungeonMap.createMap();
 
         StdDraw.setPenColor(StdDraw.RED);
         for (Rectangle r : dungeonMap.mainRooms) {
             GraphUtils.drawRect(r);
-        }
-
-        Set<Triangle> triangles = new Delaunay().bowyerWatson(dungeonMap.getCenters(dungeonMap.mainRooms));
-        StdDraw.setPenColor(StdDraw.GREEN);
-        for (Triangle triangle : triangles) {
-            for (Line2D edge : triangle.getSides()) {
-                StdDraw.line(edge.getX1(), edge.getY1(), edge.getX2(), edge.getY2());
-            }
         }
     }
 }
