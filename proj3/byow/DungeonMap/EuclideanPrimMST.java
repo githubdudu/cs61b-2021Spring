@@ -16,12 +16,12 @@ public class EuclideanPrimMST extends PrimMST {
         this.graph = G;
     }
 
-    public Iterable<Line2D> lines() {
-        Set<Line2D> set = new HashSet<>();
+    public Set<Triangle.Side> sides() {
+        Set<Triangle.Side> set = new HashSet<>();
         for (Edge edge : super.edges()) {
             int v = edge.either();
             int w = edge.other(v);
-            set.add(new Line2D.Double(graph.pointOf(v), graph.pointOf(w)));
+            set.add(new Triangle.Side(graph.pointOf(v), graph.pointOf(w)));
         }
         return set;
     }
@@ -33,7 +33,7 @@ public class EuclideanPrimMST extends PrimMST {
     public void show(Color color) {
         StdDraw.setPenColor(color);
         StdDraw.setPenRadius(0.006);
-        for (Line2D line : lines()) {
+        for (Line2D line : sides()) {
             StdDraw.line(line.getX1(), line.getY1(), line.getX2(), line.getY2());
         }
         StdDraw.setPenRadius();

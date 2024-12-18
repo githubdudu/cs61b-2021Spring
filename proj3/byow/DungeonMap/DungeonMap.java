@@ -1,5 +1,8 @@
 package byow.DungeonMap;
 
+import byow.Core.RandomUtils;
+import edu.princeton.cs.introcs.StdDraw;
+
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -23,17 +26,15 @@ public class DungeonMap {
 
         List<Point2D> mainCenters = getCenters(this.randomRooms.getMainRooms());
         Set<Triangle> mainTriangles = new Delaunay().bowyerWatson(mainCenters);
-        Set<Line2D> mainSides = this.getSides(mainTriangles);
+        Set<Triangle.Side> mainSides = this.getSides(mainTriangles);
 
-        this.graph = new EuclideanEdgeWeightedGraph(mainSides, mainSides.size());
+        this.graph = new EuclideanEdgeWeightedGraph(new HashSet<Line2D>(mainSides), mainSides.size());
         this.mst = new EuclideanPrimMST(this.graph);
-        this.graph.show();
-        this.mst.show();
-        for (Line2D line : this.mst.lines()) {
-            mainPath.add(line);
-        }
+        this.setMainPath(mainSides, this.mst.sides());
 
+        show();
         System.out.println("There are " + mainTriangles.size() + " triangles.");
+        buildPath(this.mainPath);
     }
 
     /**
@@ -59,14 +60,40 @@ public class DungeonMap {
     }
 
 
-    private Set<Line2D> getSides(Iterable<Triangle> triangles) {
-        Set<Line2D> sides = new HashSet<>();
+    private Set<Triangle.Side> getSides(Iterable<Triangle> triangles) {
+        Set<Triangle.Side> sides = new HashSet<>();
         triangles.forEach(t -> {
             sides.add(new Triangle.Side(t.a, t.b));
             sides.add(new Triangle.Side(t.b, t.c));
             sides.add(new Triangle.Side(t.c, t.a));
         });
         return sides;
+    }
+
+    private void setMainPath(Set<Triangle.Side> sides, Set<Triangle.Side> mstSides) {
+        this.mainPath.addAll(mstSides);
+
+        Set<Triangle.Side> remainingSides = new HashSet<>(sides);
+        remainingSides.removeAll(mstSides);
+
+        addRemainingEdgesToMainPath(remainingSides.toArray(Triangle.Side[]::new));
+    }
+
+    private void addRemainingEdgesToMainPath(Triangle.Side[] remainingSides) {
+        //  choose remaining edges to add to mst
+        RandomUtils.shuffle(random, remainingSides);
+        int addedCount = (int) (remainingSides.length * 0.15);
+        this.mainPath.addAll(Arrays.asList(remainingSides).subList(0, addedCount));
+    }
+
+    public void show() {
+        this.graph.show();
+        this.mst.show();
+        for (Line2D line : this.mainPath) {
+            StdDraw.setPenColor(StdDraw.YELLOW);
+            StdDraw.setPenRadius();
+            StdDraw.line(line.getX1(), line.getY1(), line.getX2(), line.getY2());
+        }
     }
 
     public static void main(String[] args) {
