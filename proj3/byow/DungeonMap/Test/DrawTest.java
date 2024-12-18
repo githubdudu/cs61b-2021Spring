@@ -40,8 +40,9 @@ public class DrawTest {
 
     @Test
     public void testGenerationOfRandomRooms() throws InterruptedException {
+        GraphUtils.SETTINGS1.CELL_COUNT = 100;
         Rectangle[] rectangles = new RandomRooms(random,
-                new DungeonMap(GraphUtils.SETTINGS1).getCenterEllipse(), 100, 7).getRooms();
+                new DungeonMap(GraphUtils.SETTINGS1).getCenterEllipse(), GraphUtils.SETTINGS1).getAllRooms();
         for (int i = 0; i < rectangles.length; i++) {
             StdDraw.setPenColor(colors[i % colors.length]);
             drawRectInnerLine(rectangles[i]);

@@ -28,8 +28,9 @@ public class RandomRoomsTest {
                 // Test Rectangles generation
                 Ellipse2D el = new DungeonMap(GraphUtils.SETTINGS1).getCenterEllipse();
                 GraphUtils.drawEllipse(el);
-                RandomRooms rr = new RandomRooms(random, el, N, 7);
-                Rectangle[] rectangles = rr.getRooms();
+                GraphUtils.SETTINGS1.CELL_COUNT = N;
+                RandomRooms rr = new RandomRooms(random, el, GraphUtils.SETTINGS1);
+                Rectangle[] rectangles = rr.getAllRooms();
                 for (int i = 0; i < N; i++) {
                     Rectangle r = rectangles[i];
                     StdDraw.setPenColor(colors[i % colors.length]);

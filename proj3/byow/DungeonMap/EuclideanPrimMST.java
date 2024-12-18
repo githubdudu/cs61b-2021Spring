@@ -32,9 +32,10 @@ public class EuclideanPrimMST extends PrimMST {
 
     public void show(Color color) {
         StdDraw.setPenColor(color);
-        StdDraw.setPenRadius(0.004);
+        StdDraw.setPenRadius(0.006);
         for (Line2D line : lines()) {
             StdDraw.line(line.getX1(), line.getY1(), line.getX2(), line.getY2());
         }
+        StdDraw.setPenRadius();
     }
 }

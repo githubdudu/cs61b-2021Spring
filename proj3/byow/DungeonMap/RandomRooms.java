@@ -5,6 +5,9 @@ import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -25,16 +28,19 @@ import java.util.Random;
  */
 public class RandomRooms {
     private Rectangle[] rooms;
+    private List<Rectangle> mainRooms = new ArrayList<>();
+    private List<Rectangle> sideRooms = new ArrayList<>();
     /**
      * Generate N rectangles that are not overlapping and randomly positioned in the room / canvas.
      * The room is defined by the width and height.
      *
      * @param random      the random object
      * @param centerScope the ellipse that the center of the generated rectangles should be in
-     * @param N           the number of rectangles we want to generate
-     * @param lambda      the lambda of the Poisson distribution of width and height
+     * @param settings    the settings of the dungeon
      */
-    public RandomRooms(Random random, Ellipse2D centerScope, int N, int lambda) {
+    public RandomRooms(Random random, Ellipse2D centerScope, Settings settings) {
+        int N = settings.CELL_COUNT;
+        int lambda = settings.LAMBDA;
         rooms = new Rectangle[N];
         RandomRectangle rRect = new RandomRectangle(random, centerScope, lambda);
         for (int i = 0; i < N; i++) {
@@ -43,17 +49,35 @@ public class RandomRooms {
         draw();
         separateOut(random);
         rooms = removeOutliers(rooms);
+
+        selectMainRooms(settings);
+        draw();
     }
 
-    public Rectangle[] getRooms() {
+    public Rectangle[] getAllRooms() {
         return rooms;
+    }
+
+    public List<Rectangle> getMainRooms() {
+        return mainRooms;
+    }
+
+    public List<Rectangle> getSideRooms() {
+        return sideRooms;
     }
 
     public void draw() {
         for (Rectangle r : rooms) {
             GraphUtils.drawRect(r);
         }
+        StdDraw.setPenRadius(0.006);
+        for (Rectangle r : mainRooms) {
+            StdDraw.setPenColor(Color.RED);
+            GraphUtils.drawRect(r);
+        }
+        StdDraw.setPenRadius();
     }
+
     /**
      * Separate out the rectangles that are overlapping.
      * The rectangles are randomly shuffled to avoid the case that the rectangles are jammed between
@@ -111,4 +135,46 @@ public class RandomRooms {
     private Rectangle[] removeOutliers(Rectangle[] rectangles) {
         return rectangles;
     }
+
+
+
+    /**
+     * Select main rooms by their width and height which are greater than the average width and height
+     * multiplied by the threshold.
+     * <p>
+     * Select side rooms by their width and height which are less than the average width and height
+     * multiplied by the threshold.
+     *
+     */
+    private void selectMainRooms(Settings settings) {
+        // average of the heights and width of all rooms
+        double avgWidth = getWidthAvg();
+        double avgHeight = getHeightAvg();
+        double widthThreshold = avgWidth * settings.SIZE_THRESHOLD;
+        double heightThreshold = avgHeight * settings.SIZE_THRESHOLD;
+        for (Rectangle room : rooms) {
+            if (room.width > widthThreshold && room.height > heightThreshold) {
+                mainRooms.add(room);
+            } else {
+                sideRooms.add(room);
+            }
+        }
+    }
+
+    private double getWidthAvg() {
+        return getWidthSum() / rooms.length;
+    }
+
+    private double getHeightAvg() {
+        return getHeightSum() / rooms.length;
+    }
+
+    private double getWidthSum() {
+        return Arrays.stream(rooms).mapToDouble(r -> r.width).sum();
+    }
+
+    private double getHeightSum() {
+        return Arrays.stream(rooms).mapToDouble(r -> r.height).sum();
+    }
+
 }
