@@ -13,28 +13,6 @@ public class HexWorld {
     private static final long SEED = 2873123;
     private static final Random RANDOM = new Random(SEED);
 
-    public static void addHexagon(TETile[][] world, int size, int x, int y, TETile t) {
-        int width = 3 * size - 2;
-        for (int i = 0; i < size; i++) {
-            int dx = size - 1;
-            for (int j = dx - i; j < width - dx + i; j++) {
-                world[x + j][y + i] = TETile.colorVariant(t, 32, 32, 32, RANDOM);
-            }
-        }
-        for (int i = 0; i < size; i++) {
-            for (int j = i; j < width - i; j++) {
-                world[x + j][y + i + size] = TETile.colorVariant(t, 32, 32, 32, RANDOM);
-            }
-        }
-    }
-
-    private static void addSerialOfHexagon(TETile[][] world, int size, int count, int x, int y) {
-        for (int i = 0; i < count; i++) {
-            addHexagon(world, size, x, y, randomTile());
-            x += 4 * size - 2;
-        }
-    }
-
     /**
      * Create a Hex world in the pattern that consisting of 19 hexagons.
      *
@@ -61,6 +39,19 @@ public class HexWorld {
         return world;
     }
 
+
+    private static void addSerialOfHexagon(TETile[][] world, int size, int count, int x, int y) {
+        for (int i = 0; i < count; i++) {
+            addHexagon(world, size, x, y, randomTile());
+            x += 4 * size - 2;
+        }
+    }
+
+    public static int getCount(int lineCount) {
+        int[] count = {1, 2, 3, 2, 3, 2, 3, 2, 1};
+        return count[lineCount];
+    }
+
     public static int getStartOfX(int lineCount, int size) {
         int x = lineCount % 2 == 0 ? 0 : size * 2 - 1;
         if (lineCount == 0 || lineCount == 8) {
@@ -73,10 +64,22 @@ public class HexWorld {
         return lineCount * size;
     }
 
-    public static int getCount(int lineCount) {
-        int[] count = {1, 2, 3, 2, 3, 2, 3, 2, 1};
-        return count[lineCount];
+
+    public static void addHexagon(TETile[][] world, int size, int x, int y, TETile t) {
+        int width = 3 * size - 2;
+        for (int i = 0; i < size; i++) {
+            int dx = size - 1;
+            for (int j = dx - i; j < width - dx + i; j++) {
+                world[x + j][y + i] = TETile.colorVariant(t, 32, 32, 32, RANDOM);
+            }
+        }
+        for (int i = 0; i < size; i++) {
+            for (int j = i; j < width - i; j++) {
+                world[x + j][y + i + size] = TETile.colorVariant(t, 32, 32, 32, RANDOM);
+            }
+        }
     }
+
 
     /**
      * Picks a RANDOM tile
