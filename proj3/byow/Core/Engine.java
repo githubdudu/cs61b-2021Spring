@@ -12,7 +12,11 @@ public class Engine {
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
-
+    /**
+     * The development environment flag.
+     */
+    public static final boolean DEV_ENV = System.getenv("dev_env") != null && Boolean.parseBoolean(System.getenv("dev_env"));
+    final boolean SHOW_GENERATION_PROGRESS = false;
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
@@ -71,7 +75,22 @@ public class Engine {
 
         final Long SEED = Long.parseLong(seedString.toString());
 
+        // For testing purposes.
+        if (DEV_ENV) {
+            if (SHOW_GENERATION_PROGRESS) {
+                GraphUtils.initCanvas(GraphUtils.SETTINGS2);
+            } else {
+                ter.initialize(GraphUtils.SETTINGS2.WIDTH, GraphUtils.SETTINGS2.HEIGHT);
+            }
+        }
+
         TETile[][] finalWorldFrame = new DungeonMap(GraphUtils.SETTINGS2, SEED).getWorldFrame();
+
+        // For testing purposes.
+        if (DEV_ENV) {
+            ter.initialize(GraphUtils.SETTINGS2.WIDTH, GraphUtils.SETTINGS2.HEIGHT);
+            ter.renderFrame(finalWorldFrame);
+        }
         return finalWorldFrame;
     }
 }

@@ -1,5 +1,6 @@
 package byow.DungeonMap;
 
+import byow.Core.Engine;
 import byow.Core.RandomUtils;
 import edu.princeton.cs.introcs.StdDraw;
 
@@ -66,8 +67,17 @@ public class RandomRooms {
         return sideRooms;
     }
 
-    // TODO: remove this method or make it controlled by a flag
+    /*
+     * Draw the rectangles on the canvas.
+     * <p>
+     * If the env variable DEV_ENV is false, this method won't run and the display will be skipped.
+     */
     public void draw() {
+        // If the env variable DEV_ENV is false, skip the display.
+        if (!Engine.DEV_ENV) {
+            return;
+        }
+        StdDraw.clear();
         for (Rectangle r : rooms) {
             GraphUtils.drawRect(r);
         }
@@ -104,9 +114,7 @@ public class RandomRooms {
                     }
                 }
             }
-            //  TODO: remove this line or make it controlled by a flag: this could cause the drawing
-            //   of a white board.
-            StdDraw.clear();
+
             draw();
         }
     }

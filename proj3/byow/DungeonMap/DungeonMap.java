@@ -1,5 +1,6 @@
 package byow.DungeonMap;
 
+import byow.Core.Engine;
 import byow.Core.RandomUtils;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
@@ -302,9 +303,14 @@ public class DungeonMap {
 
     /**
      * Show the graph, the minimum spanning tree and the main path.
+     * <p>
+     * If the env variable DEV_ENV is false, this method won't run and the display of the graph will be skipped.
      */
     public void showGraph() {
-        // TODO: remove this method or control the display of the graph.
+        // If the env variable DEV_ENV is false, skip the display of the graph.
+        if (!Engine.DEV_ENV) {
+            return;
+        }
         this.graph.show();
         this.mst.show();
         for (Line2D line : this.mainPath) {
@@ -319,10 +325,15 @@ public class DungeonMap {
      * @param args
      */
     public static void main(String[] args) {
+        // To show the animation of the generation process, this method should be used instead of
+        // the ter.initialize() method. The ter.initialize() method will enable the StdDraw double
+        // buffering, which will cause the animation gone.
         GraphUtils.initCanvas(GraphUtils.SETTINGS1);
         GraphUtils.SETTINGS1.SIZE_THRESHOLD = 1.0;
         TERenderer ter = new TERenderer();
         DungeonMap dungeonMap = new DungeonMap(GraphUtils.SETTINGS1, 123L);
+        // After the dungeon map is generated, the world frame can be rendered by this method,
+        // otherwise the animation will be too slow.
         ter.initialize(GraphUtils.SETTINGS1.WIDTH, GraphUtils.SETTINGS1.HEIGHT);
         ter.renderFrame(dungeonMap.getWorldFrame());
     }
