@@ -26,3 +26,6 @@ Top down approach.
 Answer:
 hallway is narrow and long, room is wide and short.
 Similarity: both are defined by walls. 
+
+### JDK version
+The setting of project: set jdk 16 to jdk 15.(align with Gradescope) https://sp21.datastructur.es/about.html#software

@@ -72,7 +72,6 @@ public class DungeonMap {
 
         // Show the graph, the minimum spanning tree and the main path.
         showGraph();
-        System.out.println("There are " + delaunayTriangles.size() + " triangles.");
         // Create the hallways paths.
         this.hallwayPaths = buildHallwayPaths(this.mainPath);
         // Create the hallway with shape variations.

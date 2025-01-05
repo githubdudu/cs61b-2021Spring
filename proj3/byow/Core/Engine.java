@@ -15,8 +15,15 @@ public class Engine {
     /**
      * The development environment flag.
      */
-    public static final boolean DEV_ENV = System.getenv("dev_env") != null && Boolean.parseBoolean(System.getenv("dev_env"));
+    public static boolean DEV_ENV = false;
     final boolean SHOW_GENERATION_PROGRESS = false;
+    public Engine() {
+        try {
+            DEV_ENV = System.getenv("DEV_ENV").equals("true");
+        } catch (NullPointerException | SecurityException e) {
+            DEV_ENV = false;
+        }
+    }
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
