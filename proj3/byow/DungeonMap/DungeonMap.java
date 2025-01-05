@@ -13,6 +13,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DungeonMap {
     /**
@@ -98,7 +99,8 @@ public class DungeonMap {
      */
     public List<Point2D> getCentersOfRooms(List<Rectangle> rooms) {
         return rooms.stream().map(
-                r -> (Point2D) new Point2D.Double(r.getCenterX(), r.getCenterY())).toList();
+                r -> (Point2D) new Point2D.Double(r.getCenterX(), r.getCenterY())).collect(
+                Collectors.toList());
     }
 
 
