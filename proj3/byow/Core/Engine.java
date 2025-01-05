@@ -1,5 +1,9 @@
 package byow.Core;
 
+import byow.DungeonMap.DungeonMap;
+import byow.DungeonMap.GraphUtils;
+import byow.InputDemo.InputSource;
+import byow.InputDemo.StringInputDevice;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
@@ -45,9 +49,29 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
-        final Long SEED = Long.parseLong(input.substring(1));
+        InputSource stringInput = new StringInputDevice(input);
+        boolean newGame = false;
 
-        TETile[][] finalWorldFrame = null;
+        // Check if new game or load game.
+        if (stringInput.possibleNextInput()) {
+            char c = stringInput.getNextKey();
+            newGame = c == 'n' || c == 'N';
+        }
+
+        // Get the seed string.
+        StringBuilder seedString = new StringBuilder();
+        if (newGame) {
+            while (stringInput.possibleNextInput()) {
+                char c = stringInput.getNextKey();
+                if (c != 's' && c != 'S') {
+                    seedString.append(c);
+                }
+            }
+        }
+
+        final Long SEED = Long.parseLong(seedString.toString());
+
+        TETile[][] finalWorldFrame = new DungeonMap(GraphUtils.SETTINGS2, SEED).getWorldFrame();
         return finalWorldFrame;
     }
 }

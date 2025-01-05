@@ -9,7 +9,7 @@ import java.awt.geom.Rectangle2D;
 
 public class GraphUtils {
     final public static Settings SETTINGS1 = new Settings(100, 60, 16, 70, 10, 60, 1.05, 7);
-    final public static Settings SETTINGS2 = new Settings(100, 60, 8, 70, 10, 60, 1.00, 7);
+    final public static Settings SETTINGS2 = new Settings(100, 60, 16, 70, 10, 60, 1.00, 7);
     /**
      * 1920 X 1080
      */

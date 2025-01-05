@@ -48,9 +48,9 @@ public class DungeonMap {
      */
     private List<Rectangle> hallwayWallVariation = new ArrayList<>();
 
-    public DungeonMap(Settings settings) {
+    public DungeonMap(Settings settings, Long seed) {
         this.settings = settings;
-        this.random = new Random(123L);
+        this.random = new Random(seed);
         // Generate the random rooms with the centers inside the ellipse
         this.randomRooms = new RandomRooms(random, getCenterEllipse(), settings);
 
@@ -241,11 +241,15 @@ public class DungeonMap {
             int y2 = (int) hallway.getY2();
             if (x1 == x2) {
                 for (int i = Math.min(y1, y2); i <= Math.max(y1, y2); i++) {
-                    world[x1][i] = getRandomHallwayTile();
+                    if (x1 >= 0 && x1 < settings.WIDTH && i >= 0 && i < settings.HEIGHT) {
+                        world[x1][i] = getRandomHallwayTile();
+                    }
                 }
             } else if (y1 == y2) {
                 for (int i = Math.min(x1, x2); i <= Math.max(x1, x2); i++) {
-                    world[i][y1] = getRandomHallwayTile();
+                    if (i >= 0 && i < settings.WIDTH && y1 >= 0 && y1 < settings.HEIGHT) {
+                        world[i][y1] = getRandomHallwayTile();
+                    }
                 }
             }
         }
@@ -254,7 +258,9 @@ public class DungeonMap {
         for (Rectangle room : randomRooms.getMainRooms()) {
             for (int i = room.x; i < room.x + room.width; i++) {
                 for (int j = room.y; j < room.y + room.height; j++) {
-                    world[i][j] = getRandomRoomTile();
+                    if (i >= 0 && i < settings.WIDTH && j >= 0 && j < settings.HEIGHT) {
+                        world[i][j] = getRandomRoomTile();
+                    }
                 }
             }
         }
@@ -262,6 +268,11 @@ public class DungeonMap {
         // 4. Create the walls.
         for (int i = 0; i < settings.WIDTH; i++) {
             for (int j = 0; j < settings.HEIGHT; j++) {
+                if (i == 0 || i == settings.WIDTH - 1 || j == 0 || j == settings.HEIGHT - 1) {
+                    if (world[i][j] != Tileset.WALL && world[i][j] != Tileset.NOTHING) {
+                        world[i][j] = Tileset.WALL;
+                    }
+                }
                 if (world[i][j] == Tileset.NOTHING) {
                     if (i > 0 && world[i - 1][j] != Tileset.NOTHING && world[i - 1][j] != Tileset.WALL) {
                         world[i][j] = Tileset.WALL;
@@ -309,7 +320,7 @@ public class DungeonMap {
         GraphUtils.initCanvas(GraphUtils.SETTINGS1);
         GraphUtils.SETTINGS1.SIZE_THRESHOLD = 1.0;
         TERenderer ter = new TERenderer();
-        DungeonMap dungeonMap = new DungeonMap(GraphUtils.SETTINGS1);
+        DungeonMap dungeonMap = new DungeonMap(GraphUtils.SETTINGS1, 123L);
         ter.initialize(GraphUtils.SETTINGS1.WIDTH, GraphUtils.SETTINGS1.HEIGHT);
         ter.renderFrame(dungeonMap.getWorldFrame());
     }

@@ -26,7 +26,7 @@ public class RandomRoomsTest {
         switch (args[0]) {
             case "rectangle":
                 // Test Rectangles generation
-                Ellipse2D el = new DungeonMap(GraphUtils.SETTINGS1).getCenterEllipse();
+                Ellipse2D el = new DungeonMap(GraphUtils.SETTINGS1, 123L).getCenterEllipse();
                 GraphUtils.drawEllipse(el);
                 GraphUtils.SETTINGS1.CELL_COUNT = N;
                 RandomRooms rr = new RandomRooms(random, el, GraphUtils.SETTINGS1);
