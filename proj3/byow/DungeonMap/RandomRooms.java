@@ -66,6 +66,7 @@ public class RandomRooms {
         return sideRooms;
     }
 
+    // TODO: remove this method or make it controlled by a flag
     public void draw() {
         for (Rectangle r : rooms) {
             GraphUtils.drawRect(r);
@@ -103,7 +104,8 @@ public class RandomRooms {
                     }
                 }
             }
-
+            //  TODO: remove this line or make it controlled by a flag: this could cause the drawing
+            //   of a white board.
             StdDraw.clear();
             draw();
         }

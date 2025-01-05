@@ -49,6 +49,7 @@ public class DungeonMap {
     private List<Rectangle> hallwayWallVariation = new ArrayList<>();
 
     public DungeonMap(Settings settings, Long seed) {
+        // TODO: Reorganise Classes to different folders.
         this.settings = settings;
         this.random = new Random(seed);
         // Generate the random rooms with the centers inside the ellipse
@@ -303,6 +304,7 @@ public class DungeonMap {
      * Show the graph, the minimum spanning tree and the main path.
      */
     public void showGraph() {
+        // TODO: remove this method or control the display of the graph.
         this.graph.show();
         this.mst.show();
         for (Line2D line : this.mainPath) {
