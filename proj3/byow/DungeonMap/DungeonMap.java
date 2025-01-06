@@ -58,7 +58,7 @@ public class DungeonMap {
         this.randomRooms = new RandomRooms(random, getCenterEllipse(), settings);
 
         // Get the centers of the main rooms
-        List<Point2D> mainCenters = getCentersOfRooms(this.randomRooms.getMainRooms());
+        List<Point2D> mainCenters = this.randomRooms.getMainRoomCenters();
         // Get the Delaunay triangulation
         Set<Triangle> delaunayTriangles = new Delaunay().bowyerWatson(mainCenters);
         // Get the sides of the Delaunay triangulation
@@ -89,19 +89,6 @@ public class DungeonMap {
                 settings.CENTER.y - settings.ELLIPSE_B_DEFAULT / 2, settings.ELLIPSE_A_DEFAULT,
                 settings.ELLIPSE_B_DEFAULT);
     }
-
-    /**
-     * Get the list of centers of a list of rooms.
-     *
-     * @param rooms a list of rooms
-     * @return the list of centers
-     */
-    public List<Point2D> getCentersOfRooms(List<Rectangle> rooms) {
-        return rooms.stream().map(
-                r -> (Point2D) new Point2D.Double(r.getCenterX(), r.getCenterY())).collect(
-                Collectors.toList());
-    }
-
 
     /**
      * Convert a list of triangles to a set of sides.
