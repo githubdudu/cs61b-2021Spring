@@ -16,8 +16,8 @@ public class EuclideanPrimMST extends PrimMST {
         this.graph = G;
     }
 
-    public Set<Triangle.Side> sides() {
-        Set<Triangle.Side> set = new HashSet<>();
+    public Set<Line2D> sides() {
+        Set<Line2D> set = new HashSet<>();
         for (Edge edge : super.edges()) {
             int v = edge.either();
             int w = edge.other(v);
