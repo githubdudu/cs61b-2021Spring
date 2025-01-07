@@ -3,6 +3,8 @@ package byow.DungeonMap;
 import byow.Core.Engine;
 import byow.Core.RandomUtils;
 import byow.Delaunay.Delaunay;
+import byow.Graph.EuclideanEdgeWeightedGraph;
+import byow.Graph.EuclideanPrimMST;
 import byow.Rooms.RandomRooms;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
@@ -52,7 +54,6 @@ public class DungeonMap {
     private List<Rectangle> hallwayWallVariation = new ArrayList<>();
 
     public DungeonMap(Settings settings, Long seed) {
-        // TODO: Reorganise Classes to different folders.
         this.settings = settings;
         this.random = new Random(seed);
         // Generate the random rooms with the centers inside the ellipse

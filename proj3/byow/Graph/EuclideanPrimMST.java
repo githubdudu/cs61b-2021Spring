@@ -1,4 +1,4 @@
-package byow.DungeonMap;
+package byow.Graph;
 
 import byow.Delaunay.Triangle;
 import edu.princeton.cs.algs4.Edge;

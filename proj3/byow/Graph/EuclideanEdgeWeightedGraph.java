@@ -1,20 +1,22 @@
-package byow.DungeonMap;
+package byow.Graph;
 
-import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.Edge;
+import edu.princeton.cs.algs4.EdgeWeightedGraph;
+import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map;
 
-class EuclideanDigraph {
+public class EuclideanEdgeWeightedGraph {
     private Map<Point2D, Integer> map; // Point2D -> index
     private Point2D[] keys; // index -> Point2D
-    private Digraph digraph; // the graph
+    private EdgeWeightedGraph graph; // the graph
 
-    public EuclideanDigraph(Iterable<Line2D> lines, int N) {
+    public EuclideanEdgeWeightedGraph(Iterable<Line2D> lines, int N) {
         map = new HashMap<>();
-        digraph = new Digraph(N);
+        graph = new EdgeWeightedGraph(N);
 
         for (Line2D line : lines) {
             Point2D p1 = line.getP1();
@@ -25,7 +27,7 @@ class EuclideanDigraph {
             if (!map.containsKey(p2)) {
                 map.put(p2, map.size());
             }
-            digraph.addEdge(map.get(p1), map.get(p2));
+            graph.addEdge(new Edge(map.get(p1), map.get(p2), p1.distance(p2)));
         }
 
         // inverted indexOf to get string keys in an array
@@ -48,11 +50,18 @@ class EuclideanDigraph {
         return keys[v];
     }
 
-    public Digraph graph() {
-        return digraph;
+    public EdgeWeightedGraph graph() {
+        return graph;
     }
 
     public void show() {
-
+        StdDraw.setPenColor(StdDraw.GREEN);
+        for (Edge edge : graph.edges()) {
+            int v = edge.either();
+            int w = edge.other(v);
+            Point2D p1 = pointOf(v);
+            Point2D p2 = pointOf(w);
+            StdDraw.line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+        }
     }
 }
