@@ -1,6 +1,6 @@
 package byow.DungeonMap.Test;
 
-import byow.DungeonMap.Triangle;
+import byow.Delaunay.Triangle;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

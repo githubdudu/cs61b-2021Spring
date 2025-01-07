@@ -1,4 +1,4 @@
-package byow.DungeonMap;
+package byow.Delaunay;
 
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;

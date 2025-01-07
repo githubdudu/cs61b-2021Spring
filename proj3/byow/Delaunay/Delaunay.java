@@ -1,4 +1,6 @@
-package byow.DungeonMap;
+package byow.Delaunay;
+
+import byow.DungeonMap.GraphUtils;
 
 import java.awt.*;
 import java.awt.geom.Line2D;

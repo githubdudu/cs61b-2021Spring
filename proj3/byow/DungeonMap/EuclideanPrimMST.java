@@ -1,5 +1,6 @@
 package byow.DungeonMap;
 
+import byow.Delaunay.Triangle;
 import edu.princeton.cs.algs4.Edge;
 import edu.princeton.cs.algs4.PrimMST;
 import edu.princeton.cs.introcs.StdDraw;
