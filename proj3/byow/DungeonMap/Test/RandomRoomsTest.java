@@ -2,7 +2,7 @@ package byow.DungeonMap.Test;
 
 import byow.DungeonMap.DungeonMap;
 import byow.DungeonMap.GraphUtils;
-import byow.DungeonMap.RandomRooms;
+import byow.Rooms.RandomRooms;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;

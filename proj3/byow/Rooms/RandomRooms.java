@@ -1,7 +1,9 @@
-package byow.DungeonMap;
+package byow.Rooms;
 
 import byow.Core.Engine;
 import byow.Core.RandomUtils;
+import byow.DungeonMap.GraphUtils;
+import byow.DungeonMap.Settings;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;

@@ -1,4 +1,4 @@
-package byow.DungeonMap;
+package byow.Rooms;
 
 import byow.Core.RandomUtils;
 
