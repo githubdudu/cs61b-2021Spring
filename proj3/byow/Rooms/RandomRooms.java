@@ -47,9 +47,9 @@ public class RandomRooms {
         int N = settings.CELL_COUNT;
         int lambda = settings.LAMBDA;
         rooms = new Rectangle[N];
-        RandomRectangle rRect = new RandomRectangle(random, centerScope, lambda);
+        RandomRoomGenerator rrg = new RandomRoomGenerator(random, centerScope, lambda);
         for (int i = 0; i < N; i++) {
-            rooms[i] = rRect.nextRectangle();
+            rooms[i] = rrg.nextRectangle();
         }
         draw();
         separateOut(random);
