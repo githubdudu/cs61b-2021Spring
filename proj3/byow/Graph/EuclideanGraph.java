@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 class EuclideanGraph {
-    private Map<Point2D, Integer> map; // Point2D -> index
-    private Point2D[] keys; // index -> Point2D
-    private Graph graph; // the graph
+    private final Map<Point2D, Integer> map; // Point2D -> index
+    private final Point2D[] keys; // index -> Point2D
+    private final Graph graph; // the graph
 
     public EuclideanGraph(Iterable<Line2D> lines, int N) {
         map = new HashMap<>();
@@ -52,7 +52,4 @@ class EuclideanGraph {
         return graph;
     }
 
-    public void show() {
-
-    }
 }

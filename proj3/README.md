@@ -41,7 +41,7 @@ A euclidean triangle representation. It has a subclass `Side` which representing
 
 Three vertices of triangle. Sorted by their x and y coordinates from smaller x to bigger x, and smaller y to bigger y if x are same.
 
-```
+```java
 private final Point2D a; 
 private final Point2D b;
 private final Point2D c;
@@ -49,14 +49,64 @@ private final Point2D c;
 
 #### Delaunay
 
+A class that will take a list of points and create delaunay triangles by bowyerwatson algorithm. `getSides()` will return a set of sides of all triangles.
 
+##### Fields
+
+`private final Set<Triangle> delaunayTriangles;`
+
+
+
+### 3. Package Graph
+
+#### EuclidenDigraph, EuclidenGraph: 
+
+no usage. Written as a practice for EuclidenEdgeWeightedGraph.
+
+#### EuclidenEdgeWeightedGraph
+
+A Euclidean representation of an edge weighted graph, where the vertices are points in the plane.
+ * It works as a wrapper. It uses a map to store the mapping from each point to the index,
+ * and an array to store the mapping from the index to the point.
+
+`show()` method will draw out the graph via `StdDraw`.
+
+##### Fields
+
+```java
+private final Map<Point2D, Integer> map; // Point2D -> index
+private final Point2D[] keys; // index -> Point2D
+private final EdgeWeightedGraph graph; // the graph
+```
+
+#### EuclidenPrimMST
+
+A Euclidean representation of the MST of an EuclideanEdgeWeightedGraph. 
+
+It's constructor will take an EuclideanEdgeWeightedGraph and `sides()` methods will return a set of `Line2D`.
+
+`show()` method will draw out the graph via `StdDraw`.
+
+##### Fields
+
+`private final EuclideanEdgeWeightedGraph graph;`
+
+
+
+### 4. Package DungeonMap
+
+#### DungeonMap
+
+##### Fields
+
+#### GraphUtils
+
+##### Fields
+
+#### Settings
 
 ##### Fields
 
 
-
-
-
-### 3. Package DungeonMap
 
 ## Algorithms

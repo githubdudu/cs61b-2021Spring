@@ -10,8 +10,11 @@ import java.awt.geom.Line2D;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * A Euclidean representation of the MST of an EuclideanEdgeWeightedGraph.
+ */
 public class EuclideanPrimMST extends PrimMST {
-    private EuclideanEdgeWeightedGraph graph;
+    private final EuclideanEdgeWeightedGraph graph;
     public EuclideanPrimMST(EuclideanEdgeWeightedGraph G) {
         super(G.graph());
         this.graph = G;
