@@ -65,7 +65,10 @@ no usage. Written as a practice for EuclidenEdgeWeightedGraph.
 
 #### EuclidenEdgeWeightedGraph
 
-A Euclidean representation of an edge weighted graph, where the vertices are points in the plane.
+A Euclidean representation of an edge weighted graph, whose vertices are points on the plane and edges are lines on the plane.
+
+It takes a `Collection<Line2D>` as contructor parameter.
+
  * It works as a wrapper. It uses a map to store the mapping from each point to the index,
  * and an array to store the mapping from the index to the point.
 

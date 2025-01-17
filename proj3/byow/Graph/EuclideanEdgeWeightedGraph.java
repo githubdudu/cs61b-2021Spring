@@ -6,6 +6,7 @@ import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,9 +20,9 @@ public class EuclideanEdgeWeightedGraph {
     private final Point2D[] keys; // index -> Point2D
     private final EdgeWeightedGraph graph; // the graph
 
-    public EuclideanEdgeWeightedGraph(Iterable<Line2D> lines, int N) {
+    public EuclideanEdgeWeightedGraph(Collection<Line2D> lines) {
         map = new HashMap<>();
-        graph = new EdgeWeightedGraph(N);
+        graph = new EdgeWeightedGraph(lines.size());
 
         for (Line2D line : lines) {
             Point2D p1 = line.getP1();

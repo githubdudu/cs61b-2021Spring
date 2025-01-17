@@ -4,6 +4,7 @@ import edu.princeton.cs.algs4.Digraph;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,9 +13,9 @@ class EuclideanDigraph {
     private final Point2D[] keys; // index -> Point2D
     private final Digraph digraph; // the graph
 
-    public EuclideanDigraph(Iterable<Line2D> lines, int N) {
+    public EuclideanDigraph(Collection<Line2D> lines) {
         map = new HashMap<>();
-        digraph = new Digraph(N);
+        digraph = new Digraph(lines.size());
 
         for (Line2D line : lines) {
             Point2D p1 = line.getP1();

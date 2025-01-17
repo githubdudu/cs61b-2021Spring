@@ -60,10 +60,11 @@ public class DungeonMap {
         this.randomRooms = new RandomRooms(random, getCenterEllipse(), settings);
 
         // Get the sides of the Delaunay triangulation
-        Set<Line2D> delaunaySides = new Delaunay(this.randomRooms.getMainRoomCenters()).getSides();
+        Delaunay delaunay = new Delaunay(this.randomRooms.getMainRoomCenters());
+        Set<Line2D> delaunaySides = delaunay.getSides();
 
         // Create the graph and the minimum spanning tree
-        this.graph = new EuclideanEdgeWeightedGraph(new HashSet<Line2D>(delaunaySides), delaunaySides.size());
+        this.graph = new EuclideanEdgeWeightedGraph(delaunaySides);
         this.mst = new EuclideanPrimMST(this.graph);
         // Create the main path
         this.setMainPath(this.mst.sides(), delaunaySides);
