@@ -1,5 +1,9 @@
 package byow.Core;
 
+import byow.DungeonMap.DungeonMap;
+import byow.DungeonMap.GraphUtils;
+import byow.InputDemo.InputSource;
+import byow.InputDemo.StringInputDevice;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
@@ -8,7 +12,18 @@ public class Engine {
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
-
+    /**
+     * The development environment flag.
+     */
+    public static boolean DEV_ENV = false;
+    final boolean SHOW_GENERATION_PROGRESS = false;
+    public Engine() {
+        try {
+            DEV_ENV = System.getenv("DEV_ENV").equals("true");
+        } catch (NullPointerException | SecurityException e) {
+            DEV_ENV = false;
+        }
+    }
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
@@ -45,8 +60,44 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
+        InputSource stringInput = new StringInputDevice(input);
+        boolean newGame = false;
 
-        TETile[][] finalWorldFrame = null;
+        // Check if new game or load game.
+        if (stringInput.possibleNextInput()) {
+            char c = stringInput.getNextKey();
+            newGame = c == 'n' || c == 'N';
+        }
+
+        // Get the seed string.
+        StringBuilder seedString = new StringBuilder();
+        if (newGame) {
+            while (stringInput.possibleNextInput()) {
+                char c = stringInput.getNextKey();
+                if (c != 's' && c != 'S') {
+                    seedString.append(c);
+                }
+            }
+        }
+
+        final Long SEED = Long.parseLong(seedString.toString());
+
+        // For testing purposes.
+        if (DEV_ENV) {
+            if (SHOW_GENERATION_PROGRESS) {
+                GraphUtils.initCanvas(GraphUtils.SETTINGS2);
+            } else {
+                ter.initialize(GraphUtils.SETTINGS2.WIDTH, GraphUtils.SETTINGS2.HEIGHT);
+            }
+        }
+
+        TETile[][] finalWorldFrame = new DungeonMap(GraphUtils.SETTINGS2, SEED).getWorldFrame();
+
+        // For testing purposes.
+        if (DEV_ENV) {
+            ter.initialize(GraphUtils.SETTINGS2.WIDTH, GraphUtils.SETTINGS2.HEIGHT);
+            ter.renderFrame(finalWorldFrame);
+        }
         return finalWorldFrame;
     }
 }

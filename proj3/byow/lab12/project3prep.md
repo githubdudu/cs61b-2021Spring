@@ -5,21 +5,27 @@ After looking at your own implementation, consider the implementation provided n
 How did your implementation differ from the given one? What lessons can be learned from it?**
 
 Answer:
+I use custom setting for counts of hexagons per row. 
 
 -----
 
 **Can you think of an analogy between the process of tessellating hexagons and randomly generating a world using rooms and hallways?
 What is the hexagon and what is the tesselation on the Project 3 side?**
-
 Answer:
+hexagon is the room and hallways.
 
 -----
 **If you were to start working on world generation, what kind of method would you think of writing first? 
 Think back to the lab and the process used to eventually get to tessellating hexagons.**
 
 Answer:
-
+Top down approach.
 -----
 **What distinguishes a hallway from a room? How are they similar?**
 
 Answer:
+hallway is narrow and long, room is wide and short.
+Similarity: both are defined by walls. 
+
+### JDK version
+The setting of project: set jdk 16 to jdk 15.(align with Gradescope) https://sp21.datastructur.es/about.html#software
