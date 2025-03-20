@@ -1,4 +1,4 @@
-package byow.DungeonMap;
+package byow.Delaunay;
 
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class Triangle {
-    Point2D a;
-    Point2D b;
-    Point2D c;
+    private final Point2D a;
+    private final Point2D b;
+    private final Point2D c;
 
     /**
      * Construct a triangle with three points

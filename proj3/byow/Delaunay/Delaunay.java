@@ -1,13 +1,18 @@
-package byow.DungeonMap;
+package byow.Delaunay;
+
+import byow.DungeonMap.GraphUtils;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 public class Delaunay {
+    private final Set<Triangle> delaunayTriangles;
+    public Delaunay(List<Point2D> pointList) {
+        delaunayTriangles = bowyerWatson(pointList);
+    }
 
     /**
      * Bowyer-Watson algorithm
@@ -53,6 +58,19 @@ public class Delaunay {
         triangulation.removeIf(t -> t.sharesVertex(superTriangle));
 
         return triangulation;
+    }
+
+    /**
+     * Convert a list of triangles to a set of sides.
+     *
+     * @return the set of sides
+     */
+    public Set<Line2D> getSides() {
+        Set<Line2D> sides = new HashSet<>();
+        for (Triangle t : delaunayTriangles) {
+            sides.addAll(Arrays.asList(t.getSides()));
+        }
+        return sides;
     }
 
     /**

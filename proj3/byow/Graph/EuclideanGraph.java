@@ -1,20 +1,21 @@
-package byow.DungeonMap;
+package byow.Graph;
 
 import edu.princeton.cs.algs4.Graph;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 class EuclideanGraph {
-    private Map<Point2D, Integer> map; // Point2D -> index
-    private Point2D[] keys; // index -> Point2D
-    private Graph graph; // the graph
+    private final Map<Point2D, Integer> map; // Point2D -> index
+    private final Point2D[] keys; // index -> Point2D
+    private final Graph graph; // the graph
 
-    public EuclideanGraph(Iterable<Line2D> lines, int N) {
+    public EuclideanGraph(Collection<Line2D> lines) {
         map = new HashMap<>();
-        graph = new Graph(N);
+        graph = new Graph(lines.size());
 
         for (Line2D line : lines) {
             Point2D p1 = line.getP1();
@@ -52,7 +53,4 @@ class EuclideanGraph {
         return graph;
     }
 
-    public void show() {
-
-    }
 }

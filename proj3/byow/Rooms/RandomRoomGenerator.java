@@ -1,4 +1,4 @@
-package byow.DungeonMap;
+package byow.Rooms;
 
 import byow.Core.RandomUtils;
 
@@ -7,12 +7,12 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.Random;
 
-public class RandomRectangle {
+public class RandomRoomGenerator {
     private final Random random;
     private final double lambda;
     private final Ellipse2D ellipse;
 
-    public RandomRectangle(Random random, Ellipse2D ellipse, double lambda) {
+    public RandomRoomGenerator(Random random, Ellipse2D ellipse, double lambda) {
         this.random = random;
         this.ellipse = ellipse;
         this.lambda = lambda;

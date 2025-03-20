@@ -2,8 +2,8 @@ package byow.DungeonMap.Test;
 
 import byow.DungeonMap.DungeonMap;
 import byow.DungeonMap.GraphUtils;
-import byow.DungeonMap.RandomRectangle;
-import byow.DungeonMap.RandomRooms;
+import byow.Rooms.RandomRoomGenerator;
+import byow.Rooms.RandomRooms;
 import edu.princeton.cs.introcs.StdDraw;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,9 +28,9 @@ public class DrawTest {
         Ellipse2D ellipse = new DungeonMap(GraphUtils.SETTINGS1, 123L).getCenterEllipse();
         GraphUtils.drawEllipse(ellipse);
 
-        RandomRectangle randomRectangle = new RandomRectangle(random, ellipse, 7);
+        RandomRoomGenerator generator = new RandomRoomGenerator(random, ellipse, 7);
         for (int i = 0; i < 100; i++) {
-            Rectangle r = randomRectangle.nextRectangle();
+            Rectangle r = generator.nextRectangle();
             StdDraw.setPenColor(colors[i % colors.length]);
             drawRectInnerLine(r);
             System.out.println(r);

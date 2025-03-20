@@ -1,15 +1,19 @@
-package byow.DungeonMap;
+package byow.Rooms;
 
 import byow.Core.Engine;
 import byow.Core.RandomUtils;
+import byow.DungeonMap.GraphUtils;
+import byow.DungeonMap.Settings;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * This class generates random rectangles in an ellipse.
@@ -29,8 +33,8 @@ import java.util.Random;
  */
 public class RandomRooms {
     private Rectangle[] rooms;
-    private List<Rectangle> mainRooms = new ArrayList<>();
-    private List<Rectangle> sideRooms = new ArrayList<>();
+    private final List<Rectangle> mainRooms = new ArrayList<>();
+    private final List<Rectangle> sideRooms = new ArrayList<>();
     /**
      * Generate N rectangles that are not overlapping and randomly positioned in the room / canvas.
      * The room is defined by the width and height.
@@ -43,9 +47,9 @@ public class RandomRooms {
         int N = settings.CELL_COUNT;
         int lambda = settings.LAMBDA;
         rooms = new Rectangle[N];
-        RandomRectangle rRect = new RandomRectangle(random, centerScope, lambda);
+        RandomRoomGenerator rrg = new RandomRoomGenerator(random, centerScope, lambda);
         for (int i = 0; i < N; i++) {
-            rooms[i] = rRect.nextRectangle();
+            rooms[i] = rrg.nextRectangle();
         }
         draw();
         separateOut(random);
@@ -67,6 +71,13 @@ public class RandomRooms {
         return sideRooms;
     }
 
+    public List<Point2D> getMainRoomCenters() {
+        return getCenters(mainRooms);
+    }
+
+    public List<Point2D> getSideRoomCenters() {
+        return getCenters(sideRooms);
+    }
     /*
      * Draw the rectangles on the canvas.
      * <p>
@@ -187,4 +198,15 @@ public class RandomRooms {
         return Arrays.stream(rooms).mapToDouble(r -> r.height).sum();
     }
 
+    /**
+     * Get the list of centers of a list of rooms.
+     *
+     * @param rooms a list of rooms
+     * @return the list of centers of the rooms
+     */
+    private List<Point2D> getCenters(List<Rectangle> rooms) {
+        return rooms.stream().map(
+                r -> (Point2D) new Point2D.Double(r.getCenterX(), r.getCenterY())).collect(
+                Collectors.toList());
+    }
 }

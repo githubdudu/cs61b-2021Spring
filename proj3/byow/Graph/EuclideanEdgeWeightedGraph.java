@@ -1,4 +1,4 @@
-package byow.DungeonMap;
+package byow.Graph;
 
 import edu.princeton.cs.algs4.Edge;
 import edu.princeton.cs.algs4.EdgeWeightedGraph;
@@ -6,17 +6,23 @@ import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A Euclidean representation of an edge weighted graph, where the vertices are points in the plane.
+ * It works as a wrapper. It uses a map to store the mapping from each point to the index,
+ * and an array to store the mapping from the index to the point.
+ */
 public class EuclideanEdgeWeightedGraph {
-    private Map<Point2D, Integer> map; // Point2D -> index
-    private Point2D[] keys; // index -> Point2D
-    private EdgeWeightedGraph graph; // the graph
+    private final Map<Point2D, Integer> map; // Point2D -> index
+    private final Point2D[] keys; // index -> Point2D
+    private final EdgeWeightedGraph graph; // the graph
 
-    public EuclideanEdgeWeightedGraph(Iterable<Line2D> lines, int N) {
+    public EuclideanEdgeWeightedGraph(Collection<Line2D> lines) {
         map = new HashMap<>();
-        graph = new EdgeWeightedGraph(N);
+        graph = new EdgeWeightedGraph(lines.size());
 
         for (Line2D line : lines) {
             Point2D p1 = line.getP1();

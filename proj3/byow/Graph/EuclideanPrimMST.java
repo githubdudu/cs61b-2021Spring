@@ -1,5 +1,6 @@
-package byow.DungeonMap;
+package byow.Graph;
 
+import byow.Delaunay.Triangle;
 import edu.princeton.cs.algs4.Edge;
 import edu.princeton.cs.algs4.PrimMST;
 import edu.princeton.cs.introcs.StdDraw;
@@ -9,15 +10,18 @@ import java.awt.geom.Line2D;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * A Euclidean representation of the MST of an EuclideanEdgeWeightedGraph.
+ */
 public class EuclideanPrimMST extends PrimMST {
-    private EuclideanEdgeWeightedGraph graph;
+    private final EuclideanEdgeWeightedGraph graph;
     public EuclideanPrimMST(EuclideanEdgeWeightedGraph G) {
         super(G.graph());
         this.graph = G;
     }
 
-    public Set<Triangle.Side> sides() {
-        Set<Triangle.Side> set = new HashSet<>();
+    public Set<Line2D> sides() {
+        Set<Line2D> set = new HashSet<>();
         for (Edge edge : super.edges()) {
             int v = edge.either();
             int w = edge.other(v);
