@@ -54,15 +54,28 @@ public class MemoryGame {
         StdDraw.enableDoubleBuffering();
 
         //TODO: Initialize random number generator
+        rand = new Random(seed);
     }
 
     public String generateRandomString(int n) {
         //TODO: Generate random string of letters of length n
-        return null;
+        char[] randomString = new char[n];
+        for (int i = 0; i < n; i++) {
+            // Generate a random int between 0 and 25
+            int nextInt = rand.nextInt(CHARACTERS.length);
+            randomString[i] =  CHARACTERS[nextInt];
+        }
+
+        return new String(randomString);
     }
 
     public void drawFrame(String s) {
         //TODO: Take the string and display it in the center of the screen
+        StdDraw.clear(Color.BLACK); // Clear the canvas with same color above
+        StdDraw.setFont(new Font("Monaco", Font.BOLD, 30));
+        StdDraw.setPenColor(Color.WHITE);
+        StdDraw.text(width/2.0, height/2.0, s);
+        StdDraw.show();
         //TODO: If game is not over, display relevant game information at the top of the screen
     }
 
