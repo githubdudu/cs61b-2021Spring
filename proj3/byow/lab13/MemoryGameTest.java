@@ -11,7 +11,9 @@ public class MemoryGameTest {
     public static void main(String[] args) {
         MemoryGameTest mgk = new MemoryGameTest();
 //        mgk.testGenerateRandomString();
-        mgk.testDrawFrame();
+//        mgk.testDrawFrame();
+//        mgk.testFlashSequence();
+//        mgk.testSolicitNCharsInput();
     }
 
     private void testGenerateRandomString() {
@@ -32,5 +34,13 @@ public class MemoryGameTest {
     private void testDrawFrame() {
         // Test the drawFrame() method
         mg.drawFrame("Hello, world!");
+    }
+    private void testFlashSequence() {
+        mg.flashSequence("Helloworld!");
+    }
+
+    private void testSolicitNCharsInput() {
+        // Test the solicitNCharsInput() method
+        mg.solicitNCharsInput(10);
     }
 }
